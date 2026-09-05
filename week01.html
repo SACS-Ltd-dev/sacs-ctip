@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SACS Academy | Week 1: SOC Operations & Analyst Thinking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-panel:#101A2E;
+    --bg-card:#141F38;
+    --bg-inset:#0A1526;
+    --line:#22314F;
+    --line-soft:#1A2540;
+    --text:#E7ECF5;
+    --text-dim:#9FADC7;
+    --text-faint:#6C7999;
+    --amber:#E3A63E;
+    --amber-dim:#9C7530;
+    --teal:#3FC1B0;
+    --teal-dim:#20554D;
+    --red:#E2604F;
+    --red-dim:#5B2A24;
+    --green:#59C27C;
+    --green-dim:#254B33;
+    --blue:#5B8DEF;
+    --purple:#9B7FE8;
+    --radius:10px;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Source Sans 3', -apple-system, Segoe UI, sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    color:#FFFFFF;
+    letter-spacing:-0.01em;
+  }
+  code, pre, .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+  a{color:var(--amber);}
+
+  /* ---------- Layout shell ---------- */
+  .shell{ display:flex; min-height:100vh; }
+  nav.toc{
+    width:280px;
+    flex-shrink:0;
+    background:var(--bg-panel);
+    border-right:1px solid var(--line);
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 22px 40px;
+  }
+  nav.toc::-webkit-scrollbar{width:6px;}
+  nav.toc::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .toc-brand{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    letter-spacing:0.14em;
+    color:var(--amber);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .toc-week{
+    font-size:20px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:24px;
+    line-height:1.3;
+  }
+  .toc-list{list-style:none;margin:0;padding:0;}
+  .toc-list a{
+    display:block;
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:14.5px;
+    padding:7px 10px;
+    border-radius:7px;
+    margin-bottom:2px;
+    transition:background .15s, color .15s;
+    border-left:2px solid transparent;
+  }
+  .toc-list a:hover{background:var(--bg-card); color:var(--text);}
+  .toc-list a.active{ color:var(--amber); background:var(--bg-card); border-left:2px solid var(--amber); }
+  .toc-list .sub{padding-left:22px; font-size:13.5px;}
+  .toc-progress{
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+
+  main{ flex:1; min-width:0; }
+  .content-wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 40px 120px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:64px 40px 48px;
+    background:
+      radial-gradient(ellipse at top right, rgba(227,166,62,0.10), transparent 55%),
+      radial-gradient(ellipse at bottom left, rgba(63,193,176,0.08), transparent 50%);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{max-width:var(--maxw); margin:0 auto;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--amber);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:rgba(227,166,62,0.10);
+    border:1px solid rgba(227,166,62,0.35);
+    padding:5px 12px;
+    border-radius:100px;
+    margin-bottom:20px;
+  }
+  .hero h1{
+    font-size:40px;
+    line-height:1.15;
+    margin:0 0 14px;
+  }
+  .hero .accent{color:var(--amber);}
+  .hero-sub{
+    font-size:18.5px;
+    color:var(--text-dim);
+    max-width:680px;
+    margin:0 0 28px;
+  }
+  .hero-meta{
+    display:flex; flex-wrap:wrap; gap:14px;
+  }
+  .meta-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    padding:8px 14px;
+    border-radius:100px;
+    font-size:13.5px;
+    color:var(--text-dim);
+  }
+  .meta-pill b{color:var(--text); font-weight:600;}
+
+  /* ---------- Sections ---------- */
+  section{padding:56px 0; border-bottom:1px solid var(--line-soft);}
+  section:last-child{border-bottom:none;}
+  .section-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--teal);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h2.section-title{ font-size:30px; margin:0 0 6px; }
+  .section-dek{ color:var(--text-dim); font-size:17px; margin:0 0 32px; max-width:680px;}
+  h3{font-size:22px; margin:36px 0 12px;}
+  h4{font-size:18px; margin:26px 0 10px; color:var(--text);}
+  p{margin:0 0 18px; color:#D6DEEE;}
+  ul,ol{margin:0 0 20px; padding-left:22px; color:#D6DEEE;}
+  li{margin-bottom:8px;}
+  strong{color:#fff; font-weight:600;}
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    background:var(--bg-card);
+    padding:20px 22px;
+    margin:22px 0;
+  }
+  .callout-title{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:15px;
+    margin-bottom:8px;
+  }
+  .callout.story{ border-left:3px solid var(--blue); }
+  .callout.story .callout-title{ color:var(--blue); }
+  .callout.mentor{ border-left:3px solid var(--amber); background:rgba(227,166,62,0.06);}
+  .callout.mentor .callout-title{ color:var(--amber); }
+  .callout.warning{ border-left:3px solid var(--red); background:rgba(226,96,79,0.06);}
+  .callout.warning .callout-title{ color:var(--red); }
+  .callout.pitfall{ border-left:3px solid var(--purple); background:rgba(155,127,232,0.06);}
+  .callout.pitfall .callout-title{ color:var(--purple); }
+  .icon{width:18px;height:18px;flex-shrink:0;}
+
+  /* ---------- Terminal / log blocks ---------- */
+  .term{
+    background:var(--bg-inset);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin:20px 0;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px;
+    background:#0D1729;
+    border-bottom:1px solid var(--line);
+  }
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-label{
+    margin-left:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--text-faint);
+  }
+  .term-body{
+    padding:16px 18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;
+    line-height:1.7;
+    overflow-x:auto;
+    color:#C9D6EC;
+    white-space:pre;
+  }
+  .term-body .f1{color:var(--teal);}
+  .term-body .f2{color:var(--amber);}
+  .term-body .f3{color:var(--red);}
+  .term-body .f4{color:var(--green);}
+  .term-body .dim{color:var(--text-faint);}
+
+  /* ---------- Tables ---------- */
+  table{width:100%; border-collapse:collapse; margin:20px 0; font-size:15px;}
+  th{
+    text-align:left; background:var(--bg-panel); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+    text-transform:uppercase; letter-spacing:0.04em;
+    padding:12px 14px; border-bottom:1px solid var(--line);
+  }
+  td{padding:12px 14px; border-bottom:1px solid var(--line-soft); color:#D6DEEE; vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td.tag{font-family:'JetBrains Mono',monospace; font-size:12.5px; white-space:nowrap;}
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-block; padding:3px 10px; border-radius:5px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .b-crit{background:var(--red-dim); color:#FFB4A8;}
+  .b-high{background:#5B2A24; color:#F5B48A;}
+  .b-med{background:var(--amber-dim); color:#FFDDA0;}
+  .b-low{background:var(--teal-dim); color:#A8ECE0;}
+  .b-info{background:#233355; color:#AFC4F5;}
+  .b-true{background:var(--green-dim); color:#B6EFC7;}
+  .b-false{background:#3A2540; color:#E3B8F0;}
+
+  /* ---------- Diagram frames ---------- */
+  .diagram{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    margin:26px 0;
+    overflow-x:auto;
+  }
+  .diagram-caption{
+    text-align:center; font-size:13.5px; color:var(--text-faint); margin-top:14px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- Tabs (for triage examples) ---------- */
+  .tabs{margin:22px 0;}
+  .tab-buttons{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1px solid var(--line); margin-bottom:0;}
+  .tab-btn{
+    background:transparent; border:none; color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500;
+    padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent;
+    transition:color .15s;
+  }
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--amber); border-bottom:2px solid var(--amber);}
+  .tab-panel{display:none; padding-top:18px;}
+  .tab-panel.active{display:block;}
+
+  /* ---------- Accordion (glossary / deep dives) ---------- */
+  .accordion-item{ border:1px solid var(--line); border-radius:var(--radius); margin-bottom:10px; overflow:hidden; background:var(--bg-card);}
+  .accordion-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:15px 18px; cursor:pointer; user-select:none;
+  }
+  .accordion-head span.term{font-weight:600; color:#fff; font-family:'Space Grotesk',sans-serif;}
+  .accordion-head .chev{transition:transform .2s; color:var(--text-faint);}
+  .accordion-item.open .chev{transform:rotate(180deg);}
+  .accordion-body{ max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 18px;}
+  .accordion-item.open .accordion-body{ max-height:600px; padding-bottom:16px;}
+
+  /* ---------- Checklist ---------- */
+  .checklist{list-style:none; padding:0; margin:20px 0;}
+  .checklist li{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:10px 0; border-bottom:1px solid var(--line-soft);
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{
+    width:18px;height:18px;flex-shrink:0;margin-top:2px;
+    border:2px solid var(--teal); border-radius:4px;
+  }
+
+  /* ---------- Numbered flow ---------- */
+  .flow-step{
+    display:flex; gap:18px; margin-bottom:0; position:relative; padding-bottom:28px;
+  }
+  .flow-step:last-child{padding-bottom:0;}
+  .flow-step::before{
+    content:''; position:absolute; left:19px; top:42px; bottom:0; width:2px;
+    background:var(--line);
+  }
+  .flow-step:last-child::before{display:none;}
+  .flow-num{
+    width:40px;height:40px;flex-shrink:0;border-radius:50%;
+    background:var(--bg-panel); border:2px solid var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--amber);
+    font-size:16px; z-index:1;
+  }
+  .flow-content h4{margin:2px 0 6px;}
+  .flow-content p{margin-bottom:4px;}
+
+  /* ---------- Deliverable / Checkpoint blocks ---------- */
+  .deliverable-box{
+    background:linear-gradient(135deg, rgba(63,193,176,0.10), rgba(63,193,176,0.02));
+    border:1px solid var(--teal-dim);
+    border-radius:var(--radius);
+    padding:26px;
+    margin:24px 0;
+  }
+  .deliverable-box .section-tag{color:var(--teal);}
+  .checkpoint-box{
+    background:linear-gradient(135deg, rgba(227,166,62,0.10), rgba(227,166,62,0.02));
+    border:1px solid var(--amber-dim);
+    border-radius:var(--radius);
+    padding:26px;
+    margin:24px 0;
+  }
+  .checkpoint-box .section-tag{color:var(--amber);}
+
+  /* ---------- Footer nav ---------- */
+  .weeknav{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:36px 0 0;
+  }
+  .weeknav a{
+    text-decoration:none; color:var(--text-dim); font-size:14.5px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .weeknav a:hover{color:var(--amber);}
+
+  /* ---------- Interactive quiz items ---------- */
+  .live-tag{
+    display:inline-block; vertical-align:middle;
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    color:var(--teal); background:rgba(63,193,176,0.10);
+    border:1px solid var(--teal-dim); border-radius:100px;
+    padding:3px 10px; margin-left:10px; letter-spacing:0.03em;
+  }
+  .quiz-item{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; margin:16px 0;
+  }
+  .quiz-q{ font-weight:600; color:#fff; margin-bottom:14px; font-size:15.5px; }
+  .quiz-options{ display:flex; flex-wrap:wrap; gap:10px; }
+  .quiz-opt{
+    background:var(--bg-inset); border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500;
+    padding:9px 18px; border-radius:8px; cursor:pointer; transition:all .15s;
+  }
+  .quiz-opt:hover{ border-color:var(--amber); color:#fff; }
+  .quiz-item.answered .quiz-opt{ cursor:default; }
+  .quiz-item.answered .quiz-opt:hover{ border-color:var(--line); color:var(--text-dim); }
+  .quiz-opt.chosen-correct{ background:var(--green-dim); border-color:var(--green); color:#B6EFC7; }
+  .quiz-opt.chosen-wrong{ background:var(--red-dim); border-color:var(--red); color:#FFB4A8; }
+  .quiz-opt.reveal-correct{ border-color:var(--green); color:#B6EFC7; }
+  .quiz-feedback{
+    display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--line);
+  }
+  .quiz-item.answered .quiz-feedback{ display:block; }
+  .quiz-feedback p{ margin-bottom:0; }
+
+  /* ---------- Drag and drop matching ---------- */
+  .match-wrap{
+    display:grid; grid-template-columns:1fr 1fr; gap:28px;
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; margin:22px 0;
+  }
+  .match-col-title{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--text-faint); margin-bottom:14px;
+  }
+  .drag-chip{
+    background:var(--bg-inset); border:1.5px solid var(--amber-dim); color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;
+    padding:12px 16px; border-radius:8px; margin-bottom:12px; cursor:grab;
+    transition:opacity .15s, transform .15s;
+  }
+  .drag-chip:active{ cursor:grabbing; }
+  .drag-chip.placed{ opacity:0.3; cursor:not-allowed; }
+  .drop-zone{
+    background:var(--bg-inset); border:1.5px dashed var(--line); border-radius:8px;
+    padding:14px 16px; margin-bottom:12px; min-height:64px;
+    font-size:13.5px; color:var(--text-dim);
+    display:flex; flex-direction:column; justify-content:center;
+    transition:border-color .15s, background .15s;
+  }
+  .drop-zone.dragover{ border-color:var(--teal); background:rgba(63,193,176,0.08); }
+  .drop-zone.filled{ border-style:solid; border-color:var(--teal); }
+  .drop-zone.filled.wrong{ border-color:var(--red); }
+  .drop-zone .dz-label{ font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px; }
+  .drop-zone .dz-text{ color:#D6DEEE; font-size:13.5px; line-height:1.5; }
+  .drop-zone.filled .dz-label{ font-family:'JetBrains Mono',monospace; }
+  .drop-zone.wrong .dz-label{ color:var(--red); }
+  .match-reset{
+    margin-top:6px; background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:13px; padding:7px 14px; border-radius:7px; cursor:pointer;
+  }
+  .match-reset:hover{ border-color:var(--amber); color:#fff; }
+  .match-status{ font-size:13.5px; color:var(--text-faint); margin-top:10px; grid-column:1/-1; }
+
+  /* ---------- "Make the call" interactive widget ---------- */
+  .callwidget{
+    background:var(--bg-inset); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; margin:18px 0;
+  }
+  .callwidget-title{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--amber); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;}
+  .call-row{ display:flex; align-items:center; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
+  .call-row .call-label{ width:110px; flex-shrink:0; font-size:13.5px; color:var(--text-dim); font-weight:600; }
+  .call-pill{
+    background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; padding:6px 13px;
+    border-radius:100px; cursor:pointer; transition:all .15s;
+  }
+  .call-pill:hover{ border-color:var(--amber); color:#fff; }
+  .call-pill.selected{ background:var(--amber); border-color:var(--amber); color:#1A1200; font-weight:600; }
+  .reveal-btn{
+    background:var(--teal); color:#08201C; border:none; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:14px; padding:10px 20px; border-radius:8px; cursor:pointer; margin-top:6px;
+  }
+  .reveal-btn:hover{ background:#57D4C3; }
+  .reveal-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .expert-analysis{ display:none; margin-top:18px; padding-top:18px; border-top:1px dashed var(--line); }
+  .expert-analysis.shown{ display:block; }
+  .match-banner{
+    font-size:13.5px; padding:9px 14px; border-radius:7px; margin-bottom:14px; display:none;
+  }
+  .match-banner.shown{ display:block; }
+  .match-banner.full-match{ background:var(--green-dim); color:#B6EFC7; }
+  .match-banner.partial-match{ background:var(--amber-dim); color:#FFDDA0; }
+
+  @media (max-width: 620px){
+    .match-wrap{ grid-template-columns:1fr; }
+  }
+
+  ::selection{ background:rgba(227,166,62,0.35); }
+
+  @media (max-width: 880px){
+    nav.toc{display:none;}
+    .content-wrap{padding:0 20px 80px;}
+    .hero{padding:44px 20px 36px;}
+    .hero h1{font-size:30px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ================= SIDE NAV ================= -->
+  <nav class="toc" id="toc">
+    <div class="toc-brand">SACS Academy · Phase I</div>
+    <div class="toc-week">Week 1: SOC Operations &amp; Analyst Thinking</div>
+    <ul class="toc-list">
+      <li><a href="#intro">Why this week matters</a></li>
+      <li><a href="#objectives">Learning objectives</a></li>
+      <li><a href="#anatomy">Anatomy of a SOC</a></li>
+      <li><a href="#alert-event-incident">Alert vs. Event vs. Incident</a></li>
+      <li><a href="#positives">True &amp; false positives</a></li>
+      <li><a href="#severity">Severity, priority &amp; confidence</a></li>
+      <li><a href="#triage">Triage &amp; escalation</a></li>
+      <li><a href="#evidence">Evidence &amp; analyst notes</a></li>
+      <li><a href="#slas">SLA, MTTA &amp; MTTR</a></li>
+      <li><a href="#handover">Case ownership &amp; handover</a></li>
+      <li><a href="#walkthrough">Hands-on: triage walkthrough</a></li>
+      <li><a href="#deliverable">This week's deliverable</a></li>
+      <li><a href="#checkpoint">Competency checkpoint</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+      <li><a href="#further">Further reading</a></li>
+    </ul>
+    <div class="toc-progress">Phase I · Week 1 of 20<br>SOC Operations and Security Telemetry</div>
+  </nav>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main>
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">● Phase I, Week 1</div>
+        <h1>SOC Operations and <span class="accent">Analyst Thinking</span></h1>
+        <p class="hero-sub">Before you touch a single tool, you need to think like the person whose job depends on getting this right at 3 a.m., with an incomplete picture, and a business that is losing money for every minute the decision takes.</p>
+        <div class="hero-meta">
+          <div class="meta-pill">🎯 <b>Focus:</b>&nbsp;Analyst reasoning, not platforms</div>
+          <div class="meta-pill">🧩 <b>Deliverable:</b>&nbsp;Alert-triage sheet</div>
+          <div class="meta-pill">🖥️ <b>Infra:</b>&nbsp;None, pen, paper, and your head</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+
+      <!-- ================= INTRO ================= -->
+      <section id="intro">
+        <div class="section-tag">Orientation</div>
+        <h2 class="section-title">Why we start here, and not with a tool</h2>
+        <p class="section-dek">Every mentee wants to open Wazuh in Week 1. We are deliberately not doing that, and by the end of this section you'll understand why that's not a delay, it's the actual foundation.</p>
+
+        <p>Picture two analysts. Both are looking at the exact same alert on the exact same screen. Analyst A has been taught tools, she knows every button in the SIEM, can write a query fast, and can navigate five different dashboards without thinking. Analyst B has been taught to <em>think</em>, she's slower on the keyboard, but every time she looks at something, she is silently asking herself: <em>is this real? What would it mean if it were? What don't I know yet? What's the cost of being wrong in either direction?</em></p>
+
+        <p>Six months into a real job, Analyst B outperforms Analyst A by a wide margin, not because she knows more shortcuts, but because tools only ever answer the questions you know to ask. A SOC analyst's real product isn't "alerts closed per shift." It's <strong>defensible decisions under uncertainty</strong>. That is a thinking skill, and like any thinking skill, it's trainable, which is exactly what this week does.</p>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> A mentor's honest take</div>
+          <p style="margin-bottom:0;">If you ever interview a junior analyst and ask "what would you do with this alert?" and they immediately reach for a tool name as the answer, that's a signal they were trained on software, not on judgement. The best answer to "what would you do?" is always a question back: <em>what do we actually know so far, and what would tell us more?</em> That instinct is what Week 1 is trying to build in you before any tool exists to hide behind.</p>
+        </div>
+
+        <p>Here's the uncomfortable truth about most junior SOC hires globally, not just in Nigeria or Africa: they can recite the definition of a "false positive" in an interview, but the moment they're handed a real, messy, ambiguous alert queue, they freeze, or worse, they rubber-stamp everything as "benign" just to clear the queue. This week exists to break that pattern before it ever forms.</p>
+      </section>
+
+      <!-- ================= OBJECTIVES ================= -->
+      <section id="objectives">
+        <div class="section-tag">Objectives</div>
+        <h2 class="section-title">By the end of this week, you will be able to</h2>
+        <ul class="checklist">
+          <li><span class="box"></span><div>Explain, in your own words, the practical difference between an <strong>event</strong>, an <strong>alert</strong>, and an <strong>incident</strong>, and correctly classify a real example into one of the three.</div></li>
+          <li><span class="box"></span><div>Distinguish a <strong>true positive</strong> from a <strong>false positive</strong> from a <strong>benign true positive</strong>, a category most junior analysts have never heard of and desperately need.</div></li>
+          <li><span class="box"></span><div>Assign <strong>severity</strong>, <strong>priority</strong>, and <strong>confidence</strong> to an alert independently of each other, and explain why conflating them is a common and costly mistake.</div></li>
+          <li><span class="box"></span><div>Walk through a structured <strong>triage decision process</strong> on an unfamiliar alert without being told the answer in advance.</div></li>
+          <li><span class="box"></span><div>Write an <strong>analyst note</strong> that another analyst, who knows nothing about the case, could pick up and continue from, cold.</div></li>
+          <li><span class="box"></span><div>Explain what <strong>SLA</strong>, <strong>MTTA</strong>, and <strong>MTTR</strong> actually measure, why a business cares about them, and how they can be gamed dishonestly (and why that's dangerous).</div></li>
+          <li><span class="box"></span><div>Produce a complete, professional <strong>alert-triage sheet</strong> for a queue of mixed alerts, this week's graded deliverable.</div></li>
+        </ul>
+      </section>
+
+      <!-- ================= ANATOMY OF A SOC ================= -->
+      <section id="anatomy">
+        <div class="section-tag">The Big Picture</div>
+        <h2 class="section-title">What a SOC actually is, underneath the acronym</h2>
+        <p class="section-dek">Strip away the marketing language and a Security Operations Centre is a fairly simple machine with one job: turn an overwhelming amount of noise into a small number of decisions worth a human's attention.</p>
+
+        <p>A modern mid-sized organisation can generate <strong>tens of millions of log events per day</strong>, every login, every file open, every DNS lookup, every firewall decision. A SOC's entire reason for existing is to compress that firehose down into something a team of humans can actually act on. The pipeline looks like this:</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 860 260" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Space Grotesk, sans-serif">
+            <defs>
+              <marker id="arrow1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#6C7999"/>
+              </marker>
+            </defs>
+            <!-- funnel stages -->
+            <g>
+              <rect x="10" y="40" width="140" height="180" rx="10" fill="#0A1526" stroke="#22314F"/>
+              <text x="80" y="30" text-anchor="middle" fill="#9FADC7" font-size="13">RAW TELEMETRY</text>
+              <text x="80" y="90" text-anchor="middle" fill="#E7ECF5" font-size="26" font-weight="700">~20M</text>
+              <text x="80" y="112" text-anchor="middle" fill="#6C7999" font-size="11">events / day</text>
+              <text x="80" y="150" text-anchor="middle" fill="#6C7999" font-size="11">logins, DNS,</text>
+              <text x="80" y="166" text-anchor="middle" fill="#6C7999" font-size="11">processes,</text>
+              <text x="80" y="182" text-anchor="middle" fill="#6C7999" font-size="11">firewall hits</text>
+            </g>
+            <line x1="150" y1="130" x2="200" y2="130" stroke="#6C7999" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <g>
+              <rect x="200" y="55" width="140" height="150" rx="10" fill="#0A1526" stroke="#22314F"/>
+              <text x="270" y="45" text-anchor="middle" fill="#9FADC7" font-size="13">CORRELATED</text>
+              <text x="270" y="100" text-anchor="middle" fill="#E7ECF5" font-size="26" font-weight="700">~4,000</text>
+              <text x="270" y="122" text-anchor="middle" fill="#6C7999" font-size="11">detection rule</text>
+              <text x="270" y="138" text-anchor="middle" fill="#6C7999" font-size="11">matches / day</text>
+              <text x="270" y="170" text-anchor="middle" fill="#6C7999" font-size="11">(SIEM correlation)</text>
+            </g>
+            <line x1="340" y1="130" x2="390" y2="130" stroke="#6C7999" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <g>
+              <rect x="390" y="70" width="140" height="120" rx="10" fill="#152038" stroke="#3FC1B0"/>
+              <text x="460" y="60" text-anchor="middle" fill="#3FC1B0" font-size="13">ALERTS</text>
+              <text x="460" y="115" text-anchor="middle" fill="#E7ECF5" font-size="26" font-weight="700">~300</text>
+              <text x="460" y="137" text-anchor="middle" fill="#6C7999" font-size="11">reach an analyst</text>
+              <text x="460" y="153" text-anchor="middle" fill="#6C7999" font-size="11">queue per day</text>
+            </g>
+            <line x1="530" y1="130" x2="580" y2="130" stroke="#6C7999" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <g>
+              <rect x="580" y="85" width="140" height="90" rx="10" fill="#1E1A30" stroke="#9B7FE8"/>
+              <text x="650" y="75" text-anchor="middle" fill="#9B7FE8" font-size="13">TRIAGED &amp; TRUE</text>
+              <text x="650" y="125" text-anchor="middle" fill="#E7ECF5" font-size="26" font-weight="700">~15</text>
+              <text x="650" y="147" text-anchor="middle" fill="#6C7999" font-size="11">confirmed real</text>
+            </g>
+            <line x1="720" y1="130" x2="770" y2="130" stroke="#6C7999" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <g>
+              <rect x="770" y="95" width="80" height="70" rx="10" fill="#2A1613" stroke="#E2604F"/>
+              <text x="810" y="85" text-anchor="middle" fill="#E2604F" font-size="12">INCIDENT</text>
+              <text x="810" y="135" text-anchor="middle" fill="#E7ECF5" font-size="24" font-weight="700">1–2</text>
+            </g>
+            <text x="810" y="230" text-anchor="middle" fill="#6C7999" font-size="11">become a real</text>
+            <text x="810" y="244" text-anchor="middle" fill="#6C7999" font-size="11">managed incident</text>
+          </svg>
+          <div class="diagram-caption">A representative daily funnel for a mid-sized organisation. The exact numbers vary wildly by industry and maturity, the shape never does.</div>
+        </div>
+
+        <p>Notice what this diagram is really telling you: <strong>the SOC's value is created almost entirely in the narrowing, not the collecting.</strong> Any company can buy a tool that ingests 20 million events a day. What separates a functioning SOC from an expensive noise machine is the human judgement that turns 300 alerts into the 1 or 2 that actually deserve an incident response. That judgement is what this whole 20-week programme is building in you, and it starts with the raw thinking skill this week teaches, before any tool automates part of the funnel for you.</p>
+
+        <h3>The three functions every SOC performs, no matter its size or budget</h3>
+        <table>
+          <tr><th>Function</th><th>What it actually means</th><th>Who typically does it</th></tr>
+          <tr><td><strong>Detect</strong></td><td>Notice that something worth looking at has happened, from the sea of everything that happened</td><td>Tier 1 / Level 1 analysts, automated rules</td></tr>
+          <tr><td><strong>Investigate</strong></td><td>Establish what actually occurred, its scope, and whether it's real</td><td>Tier 2 analysts, threat hunters</td></tr>
+          <tr><td><strong>Respond</strong></td><td>Contain, remediate, and communicate the outcome to the business</td><td>Incident responders, sometimes Tier 2/3, management</td></tr>
+        </table>
+        <p>This programme deliberately trains you across all three, because in the real job market, especially in smaller or growing SOCs, which is where most of you will start, the line between these tiers is blurry. You will frequently be asked to do all three in a single shift. A narrow specialist who can only "detect" is far less employable than someone who can carry a case from first alert to closed incident.</p>
+      </section>
+
+      <!-- ================= ALERT / EVENT / INCIDENT ================= -->
+      <section id="alert-event-incident">
+        <div class="section-tag">Core Concept 1</div>
+        <h2 class="section-title">Event, Alert, Incident: the three words you must never confuse again</h2>
+        <p class="section-dek">This sounds basic. It is not. Confusing these three words is one of the most common reasons junior analysts either panic unnecessarily or, worse, fail to escalate something serious.</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 760 300" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Space Grotesk, sans-serif">
+            <!-- concentric funnel -->
+            <polygon points="30,40 730,40 590,150 170,150" fill="#152038" stroke="#5B8DEF" stroke-width="1.5"/>
+            <polygon points="170,150 590,150 500,220 260,220" fill="#152A30" stroke="#3FC1B0" stroke-width="1.5"/>
+            <polygon points="260,220 500,220 440,270 320,270" fill="#2A1613" stroke="#E2604F" stroke-width="1.5"/>
+
+            <text x="380" y="70" text-anchor="middle" fill="#AFC4F5" font-size="17" font-weight="700">EVENT</text>
+            <text x="380" y="92" text-anchor="middle" fill="#8FA3D6" font-size="12">Anything that happened and was recorded.</text>
+            <text x="380" y="108" text-anchor="middle" fill="#8FA3D6" font-size="12">Millions per day. Mostly meaningless alone.</text>
+
+            <text x="380" y="180" text-anchor="middle" fill="#A8ECE0" font-size="16" font-weight="700">ALERT</text>
+            <text x="380" y="200" text-anchor="middle" fill="#7FCFC0" font-size="12">A rule decided a specific event (or pattern)</text>
+            <text x="380" y="214" text-anchor="middle" fill="#7FCFC0" font-size="12">is worth a human's attention.</text>
+
+            <text x="380" y="243" text-anchor="middle" fill="#FFB4A8" font-size="15" font-weight="700">INCIDENT</text>
+            <text x="380" y="260" text-anchor="middle" fill="#E89184" font-size="11.5">A human confirmed real, adverse impact</text>
+            <text x="380" y="273" text-anchor="middle" fill="#E89184" font-size="11.5">or genuine risk, now formally managed.</text>
+          </svg>
+          <div class="diagram-caption">Each layer is a subset of the one above it. Every incident was once an alert; almost no event ever becomes one.</div>
+        </div>
+
+        <h4>Event</h4>
+        <p>An event is simply <strong>a recorded occurrence</strong>. A user logging in. A file being opened. A DNS query being made. A firewall allowing a connection. Your Windows machine alone generates thousands of these per hour just from you existing on it. An event, by itself, carries almost no meaning, it's a fact, not a judgement.</p>
+
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">example, raw Windows Security event</span></div>
+          <div class="term-body"><span class="dim">EventID:</span> <span class="f2">4624</span>  <span class="dim">(An account was successfully logged on)</span>
+<span class="dim">Time:</span>     2026-08-14 09:14:02
+<span class="dim">Account:</span>  CHIDI.OKAFOR
+<span class="dim">Logon Type:</span> 3 <span class="dim">(Network)</span>
+<span class="dim">Source IP:</span> 10.20.4.15
+<span class="dim">Workstation:</span> FIN-WK-018</div>
+        </div>
+        <p>By itself, this event tells you almost nothing actionable. Chidi logs in from that workstation every single working day at roughly that time. This is <em>an</em> event, not <em>the</em> event that matters.</p>
+
+        <h4>Alert</h4>
+        <p>An alert is what you get when a detection rule, written by a human, running automatically, decides that a specific event, or a pattern of events, crosses a threshold worth flagging. An alert is a <strong>claim</strong>, not a fact. It says "this might matter," not "this does matter." That distinction is the entire reason triage exists as a discipline.</p>
+
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">example, SIEM-generated alert</span></div>
+          <div class="term-body"><span class="f2">[ALERT]</span> Rule: <span class="f1">Impossible Travel: Same Account, Two Countries</span>
+Account:      CHIDI.OKAFOR
+First logon:  09:14:02, Lagos, NG  (10.20.4.15, internal)
+Second logon: 09:26:41, Amsterdam, NL (185.220.101.7, external VPN exit node)
+Time delta:   12 minutes 39 seconds
+Distance:     ~5,100 km, physically impossible in that window
+<span class="dim">Severity: HIGH (auto-assigned) · Status: NEW</span></div>
+        </div>
+        <p>Now the same underlying account activity means something, because a correlation rule connected two events that, alone, meant nothing. This alert deserves an analyst's attention. It does not yet deserve to be called an incident, you don't know yet if it's a compromised account, a misconfigured VPN client, a travelling employee whose corporate laptop cached credentials, or a false geolocation from a shared NAT exit node.</p>
+
+        <h4>Incident</h4>
+        <p>An incident is what an alert becomes <strong>after a human has investigated it and confirmed it represents real, adverse impact or a genuine, unmitigated risk that requires a coordinated response.</strong> Not every alert becomes an incident, in fact, in a healthy, well-tuned SOC, the overwhelming majority never do. An incident carries formal weight: it gets a case number, a timeline, an owner, and usually visibility above the SOC itself (management, sometimes legal, sometimes customers).</p>
+
+        <div class="callout warning">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg> The mistake that gets people fired (or worse, gets a company breached)</div>
+          <p style="margin-bottom:0;">Calling something an "incident" too early wastes the whole organisation's time and burns your credibility. Leadership stops trusting your escalations. Calling something "just an event" when it was actually the opening move of a real breach is far worse: it's how ransomware operators sit undetected in a network for weeks. The entire discipline of triage exists to make that judgement call correctly, consistently, under time pressure, with incomplete information. That is genuinely a hard skill, it is not supposed to feel obvious yet.</p>
+        </div>
+
+        <h4>Quick self-test <span class="live-tag">Click an answer</span></h4>
+        <p>Classify each of the following as an <strong>Event</strong>, an <strong>Alert</strong>, or an <strong>Incident</strong>. Pick an answer before you scroll past it.</p>
+
+        <div class="quiz-item" data-answer="event">
+          <div class="quiz-q">1. A firewall log line showing an outbound connection to port 443 was permitted.</div>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-choice="event">Event</button>
+            <button class="quiz-opt" data-choice="alert">Alert</button>
+            <button class="quiz-opt" data-choice="incident">Incident</button>
+          </div>
+          <div class="quiz-feedback">
+            <p><strong>Event.</strong> Outbound HTTPS is normal, high-volume traffic. On its own, a single permitted connection is just a recorded fact. No rule has judged it. No human has reviewed it.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item" data-answer="alert">
+          <div class="quiz-q">2. Your EDR flags a PowerShell process spawning from Microsoft Word, and a rule fires because that parent-child relationship is unusual.</div>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-choice="event">Event</button>
+            <button class="quiz-opt" data-choice="alert">Alert</button>
+            <button class="quiz-opt" data-choice="incident">Incident</button>
+          </div>
+          <div class="quiz-feedback">
+            <p><strong>Alert.</strong> A detection rule made a judgement call that this pattern is suspicious enough to deserve human attention. It has not yet been confirmed as malicious. It could be a legitimate macro-based business process, though that would itself be worth flagging as risky practice.</p>
+          </div>
+        </div>
+
+        <div class="quiz-item" data-answer="incident">
+          <div class="quiz-q">3. After investigating alert #2, the analyst confirms the PowerShell process downloaded and executed a second-stage payload that established a connection to a known malicious IP, and multiple hosts show the same pattern.</div>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-choice="event">Event</button>
+            <button class="quiz-opt" data-choice="alert">Alert</button>
+            <button class="quiz-opt" data-choice="incident">Incident</button>
+          </div>
+          <div class="quiz-feedback">
+            <p><strong>Incident.</strong> A human has confirmed real, adverse activity with confirmed scope beyond a single host. This now needs a case number, a coordinated response, and almost certainly management visibility.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TRUE / FALSE POSITIVES ================= -->
+      <section id="positives">
+        <div class="section-tag">Core Concept 2</div>
+        <h2 class="section-title">True positives, false positives, and the category nobody teaches you</h2>
+        <p class="section-dek">Most training stops at two categories. Real SOC work needs four, and the missing two are exactly where junior analysts get it wrong.</p>
+
+        <table>
+          <tr><th>Category</th><th>Meaning</th><th>Real example</th></tr>
+          <tr><td><span class="badge b-true">TRUE POSITIVE</span></td><td>The alert fired correctly, AND the activity is genuinely malicious or unauthorised.</td><td>An alert for a known malware hash fires, and the file is confirmed malicious on the host.</td></tr>
+          <tr><td><span class="badge b-false">FALSE POSITIVE</span></td><td>The alert fired, but the activity is not what the rule assumed, the detection logic itself was wrong or too broad.</td><td>A rule designed to catch "PowerShell downloading a file" fires on your organisation's legitimate Windows Update maintenance script.</td></tr>
+          <tr><td><span class="badge b-info">BENIGN TRUE POSITIVE</span></td><td>The alert fired correctly, and the described activity genuinely happened exactly as detected, but it turns out to be authorised, expected, or otherwise harmless in this specific context.</td><td>The "impossible travel" rule correctly detected two geographically distant logins for one account, because the second one was the employee connecting through a corporate VPN concentrator based in another country.</td></tr>
+          <tr><td><span class="badge b-med">FALSE NEGATIVE</span></td><td>No alert fired at all, even though malicious activity occurred, the most dangerous category, because nobody was even asked to look.</td><td>An attacker uses a "living off the land" technique (a legitimate admin tool used maliciously) that no rule was written to catch.</td></tr>
+        </table>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> Why "benign true positive" is the category that separates juniors from seasoned analysts</div>
+          <p style="margin-bottom:0;">A junior analyst sees the VPN-travel alert, notices it's "not malicious," and writes "false positive" in the ticket. This is factually wrong, and it matters: if you mark it a false positive, someone eventually "fixes" the detection rule by weakening it, usually by excluding that VPN's IP range entirely. Six months later, an actual attacker routes through a compromised device that happens to sit on that same excluded IP range, and the rule that would have caught them was quietly disabled by a well-meaning but imprecise ticket months earlier. Calling it a <strong>benign true positive</strong> instead keeps the detection logic intact, and instead prompts a conversation about tuning context (e.g., "always require MFA-confirmed VPN sessions to suppress this alert" rather than "ignore this IP range forever").</p>
+        </div>
+
+        <h4>Real-world grounding: this distinction has caused real breaches</h4>
+        <p>In several well-documented breach post-mortems over the years, Target's 2013 breach among the most widely cited, investigators later confirmed that security tools <em>did</em> generate alerts related to the intrusion. The alerts were not acted on with appropriate urgency, partly because the team was buried under alert volume and partly because prior imprecise tuning had eroded trust in the alerting pipeline. The lesson for you, at Week 1, before you've even touched a SIEM: <strong>how you classify an alert has downstream consequences on the entire detection programme, not just on today's ticket.</strong> This is not an abstract concern, it is one of the most repeated root causes in breach retrospectives across the industry.</p>
+      </section>
+
+      <!-- ================= SEVERITY / PRIORITY / CONFIDENCE ================= -->
+      <section id="severity">
+        <div class="section-tag">Core Concept 3</div>
+        <h2 class="section-title">Severity, Priority, and Confidence: three different questions, not one</h2>
+        <p class="section-dek">Junior analysts routinely treat these as synonyms. They are three completely independent axes, and conflating them leads to either dangerous complacency or paralysing overreaction.</p>
+
+        <ul>
+          <li><strong>Severity</strong> answers: <em>"If this is real, how bad is the potential impact?"</em>, asked independent of whether you currently believe it's real.</li>
+          <li><strong>Priority</strong> answers: <em>"Given everything else on my plate right now, how soon does this need attention?"</em>, a scheduling decision, not a technical one.</li>
+          <li><strong>Confidence</strong> answers: <em>"How sure am I, right now, with the evidence I have, that this is genuinely malicious?"</em></li>
+        </ul>
+
+        <p>Here is why keeping these separate matters so much: a ransomware precursor alert (a suspicious scheduled task that matches known pre-ransomware tradecraft) can have <strong>high severity</strong> (if real, this is catastrophic) with <strong>low confidence</strong> (you've only seen one weak indicator so far) and yet still deserve <strong>high priority</strong>, because the cost of being slow, if you're wrong about the low confidence, is unacceptable. A junior analyst who conflates these three often reasons "I'm not sure this is real (low confidence), so it's probably not that bad (wrongly inferred low severity), so I'll get to it later (wrongly low priority)", and that chain of reasoning is exactly how early ransomware indicators get missed.</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 700 420" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Space Grotesk, sans-serif">
+            <!-- axes -->
+            <line x1="90" y1="370" x2="650" y2="370" stroke="#22314F" stroke-width="2"/>
+            <line x1="90" y1="370" x2="90" y2="30" stroke="#22314F" stroke-width="2"/>
+            <text x="370" y="405" text-anchor="middle" fill="#9FADC7" font-size="14">Confidence it's real →</text>
+            <text x="30" y="200" text-anchor="middle" fill="#9FADC7" font-size="14" transform="rotate(-90 30 200)">Severity if real →</text>
+
+            <!-- quadrant tints -->
+            <rect x="90" y="30" width="280" height="170" fill="#E2604F" opacity="0.08"/>
+            <rect x="370" y="30" width="280" height="170" fill="#E3A63E" opacity="0.10"/>
+            <rect x="90" y="200" width="280" height="170" fill="#3FC1B0" opacity="0.06"/>
+            <rect x="370" y="200" width="280" height="170" fill="#59C27C" opacity="0.08"/>
+
+            <text x="230" y="60" text-anchor="middle" fill="#FFB4A8" font-size="13" font-weight="700">ESCALATE ANYWAY</text>
+            <text x="230" y="80" text-anchor="middle" fill="#E89184" font-size="11">High severity, low confidence, </text>
+            <text x="230" y="94" text-anchor="middle" fill="#E89184" font-size="11">investigate urgently before dismissing</text>
+
+            <text x="510" y="60" text-anchor="middle" fill="#FFDDA0" font-size="13" font-weight="700">CONFIRMED INCIDENT</text>
+            <text x="510" y="80" text-anchor="middle" fill="#E0BE84" font-size="11">High severity, high confidence, </text>
+            <text x="510" y="94" text-anchor="middle" fill="#E0BE84" font-size="11">full incident response, now</text>
+
+            <text x="230" y="330" text-anchor="middle" fill="#A8ECE0" font-size="13" font-weight="700">MONITOR / DEPRIORITISE</text>
+            <text x="230" y="350" text-anchor="middle" fill="#7FCFC0" font-size="11">Low severity, low confidence, </text>
+            <text x="230" y="364" text-anchor="middle" fill="#7FCFC0" font-size="11">log, watch for a pattern, move on</text>
+
+            <text x="510" y="330" text-anchor="middle" fill="#B6EFC7" font-size="13" font-weight="700">ROUTINE CLOSE</text>
+            <text x="510" y="350" text-anchor="middle" fill="#8FDBA6" font-size="11">Low severity, high confidence, </text>
+            <text x="510" y="364" text-anchor="middle" fill="#8FDBA6" font-size="11">confirmed but low-stakes, close quickly</text>
+          </svg>
+          <div class="diagram-caption">Severity and confidence are independent axes. Priority is a decision you make using this map, not a third axis you guess directly.</div>
+        </div>
+
+        <h4>Drag-and-drop check <span class="live-tag">Drag each card to its match</span></h4>
+        <p>Match each term to the question it actually answers. Drag a card from the left onto the correct box on the right.</p>
+
+        <div class="match-wrap" id="matchGame">
+          <div>
+            <div class="match-col-title">Drag these</div>
+            <div class="drag-chip" draggable="true" data-term="severity">Severity</div>
+            <div class="drag-chip" draggable="true" data-term="priority">Priority</div>
+            <div class="drag-chip" draggable="true" data-term="confidence">Confidence</div>
+          </div>
+          <div>
+            <div class="match-col-title">Onto these</div>
+            <div class="drop-zone" data-correct="confidence">
+              <div class="dz-label">Drop here</div>
+              <div class="dz-text">"How sure am I, right now, that this is genuinely malicious?"</div>
+            </div>
+            <div class="drop-zone" data-correct="severity">
+              <div class="dz-label">Drop here</div>
+              <div class="dz-text">"If this turns out to be real, how bad is the damage?"</div>
+            </div>
+            <div class="drop-zone" data-correct="priority">
+              <div class="dz-label">Drop here</div>
+              <div class="dz-text">"Given everything else on my plate, how soon do I act?"</div>
+            </div>
+          </div>
+          <div class="match-status" id="matchStatus">Drag all three cards to see your score.</div>
+          <button class="match-reset" onclick="resetMatch()" style="grid-column:1/-1; width:fit-content;">Reset exercise</button>
+        </div>
+
+        <h4>Worked example: applying all three</h4>
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">alert queue entry</span></div>
+          <div class="term-body">Rule: <span class="f1">Suspicious LSASS Memory Access</span>
+Host: HR-WK-004 (Human Resources department, domain-joined)
+Process: taskmgr.exe accessing lsass.exe memory
+Time: 2026-08-14 14:02:11
+<span class="dim">One prior similar alert on this host, 11 months ago, closed as benign
+(user opened Task Manager, right-clicked a process, chose "Create Dump File")</span></div>
+        </div>
+        <p><strong>Severity:</strong> HIGH. LSASS memory access is a textbook credential-dumping technique (this maps to MITRE ATT&CK technique T1003.001, which you'll learn formally in Week 5); if this is real, an attacker could extract every cached credential on this machine.</p>
+        <p><strong>Confidence (initial):</strong> MEDIUM-LOW, task manager legitimately touches LSASS memory in specific, known circumstances, and there's a documented benign precedent on this exact host.</p>
+        <p><strong>Priority:</strong> HIGH, despite the moderate-low confidence, because the potential blast radius (severity) is too large to let sit in the queue while you investigate something with a "safer" profile. You escalate the investigation urgently precisely <em>because</em> you're not yet sure, not despite it.</p>
+      </section>
+
+      <!-- ================= TRIAGE & ESCALATION ================= -->
+      <section id="triage">
+        <div class="section-tag">Core Concept 4</div>
+        <h2 class="section-title">Triage and escalation: a repeatable process, not a gut feeling</h2>
+        <p class="section-dek">"Trust your gut" is bad advice for a Week 1 analyst, you don't have a trained gut yet. What you need instead is a process reliable enough to run even when you're tired, it's 3 a.m., and the queue has 40 alerts in it.</p>
+
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <h4>Read the whole alert before touching anything</h4>
+            <p>Note the rule name, the host, the account, the timestamp, and any fields the SIEM surfaced automatically. Resist the urge to immediately search for the IP address, orient yourself in the alert itself first.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <h4>Establish context, what is "normal" for this asset and account?</h4>
+            <p>Is this a server or a workstation? A finance department machine or a developer's laptop? Does this account normally log in at this hour, from this location, doing this kind of activity? Context is what turns a bare fact into a judgement.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <h4>Look for corroborating or contradicting evidence</h4>
+            <p>Check related logs, did anything else unusual happen around the same time on this host or account? A single suspicious indicator is a hypothesis. Multiple aligned indicators are evidence.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <h4>Classify: true positive, false positive, or benign true positive</h4>
+            <p>Make the call explicitly, and write down <em>why</em>, the reasoning is more valuable than the label itself, because the reasoning is what a reviewer or a future you will actually check.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-content">
+            <h4>Assign severity, confidence, and priority independently</h4>
+            <p>Resist collapsing these into one number. Write all three down, even when they clearly agree with each other.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">6</div>
+          <div class="flow-content">
+            <h4>Decide: close, monitor, or escalate</h4>
+            <p>If you escalate, say to whom and why, and hand over enough context that they don't have to redo your work. If you close, your closure note should let a future auditor understand your reasoning without needing to ask you.</p>
+          </div>
+        </div>
+
+        <div class="callout pitfall">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Common pitfall: "alert fatigue" triage</div>
+          <p style="margin-bottom:0;">When a queue has 80 alerts and 20 minutes left in a shift, the temptation is to skim and pattern-match to whatever was closed as benign yesterday. This is exactly how real incidents get missed. Attackers who study a target's environment sometimes deliberately generate noisy, obviously-benign-looking alerts first, hoping to desensitise the analyst before the real move. Speed is a skill you build over months of genuine practice, not a shortcut you take in Week 1 by skipping steps.</p>
+        </div>
+      </section>
+
+      <!-- ================= EVIDENCE & NOTES ================= -->
+      <section id="evidence">
+        <div class="section-tag">Core Concept 5</div>
+        <h2 class="section-title">Evidence and analyst notes, writing for a stranger, not for yourself</h2>
+        <p class="section-dek">The single habit that most separates a professional SOC from an amateur one is documentation discipline. This is not bureaucracy, it's the mechanism that lets a 24/7 operation function across shift changes, sick days, and legal proceedings.</p>
+
+        <p>Write every analyst note as though the next person to read it has zero memory of this conversation, might be reading it under legal scrutiny six months from now, and needs to be able to continue your work without calling you. That single mental model, <strong>"write for a stranger"</strong>, fixes almost every bad documentation habit before it forms.</p>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="bad">A note that fails this test</button>
+            <button class="tab-btn" data-tab="good">A note that passes it</button>
+          </div>
+          <div class="tab-panel active" id="bad">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">analyst_note.txt, do not write like this</span></div>
+              <div class="term-body">checked it, looks fine, user was probably just on vpn. closing.</div>
+            </div>
+            <p>What's wrong: no evidence cited, no reasoning shown, no indication of what "checked" even means, no timestamp of when the check happened, and "probably" with nothing backing it up. If this account is compromised next week, nobody, including you, can reconstruct what was actually verified here.</p>
+          </div>
+          <div class="tab-panel" id="good">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#59C27C"></span><span class="term-label">analyst_note.txt, the standard to aim for</span></div>
+              <div class="term-body"><span class="dim">2026-08-14 09:41 WAT, C.ADEYEMI, Tier 1</span>
+Alert: Impossible Travel, account CHIDI.OKAFOR (ref #SOC-11042)
+
+Checked VPN concentrator logs (Fortigate, VPN-01) for the
+09:26:41 Amsterdam-sourced session: confirmed source IP
+185.220.101.7 matches the corporate NL VPN exit node pool
+(range 185.220.101.0/24, documented in NetOps asset register,
+link: wiki/network/vpn-pools).
+
+Confirmed with C.OKAFOR directly via Teams at 09:38 that he
+connected via corporate VPN before his 09:14 badge-in; he was
+testing VPN failover per his manager's request (ref: change
+ticket CHG-2291).
+
+Classification: Benign True Positive. Detection logic worked
+correctly; underlying cause is authorised VPN testing.
+Recommendation: do NOT suppress this rule for this IP range, suggest adding an MFA-session correlation exception instead
+(see Week 7, detection tuning). Escalating that suggestion to
+Detection Engineering, not closing it silently.
+
+Status: CLOSED, Benign True Positive.</span></div>
+            </div>
+            <p>What's right: every claim is backed by a checked source, the human verification step is documented with a timestamp and a reference, the classification is explicit and correctly uses "benign true positive" rather than "false positive," and, critically, the analyst didn't quietly let the detection rule get weakened; they routed the tuning suggestion to the right place instead.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SLA / MTTA / MTTR ================= -->
+      <section id="slas">
+        <div class="section-tag">Core Concept 6</div>
+        <h2 class="section-title">SLA, MTTA, MTTR: the numbers your manager actually gets measured on</h2>
+        <p class="section-dek">You will hear these three acronyms constantly in a real SOC job. Understanding what they measure, and how they can be gamed, makes you noticeably more employable than someone who's only memorised the definitions.</p>
+
+        <table>
+          <tr><th>Term</th><th>Full name</th><th>What it measures</th></tr>
+          <tr><td class="tag">SLA</td><td>Service Level Agreement</td><td>A committed target, often contractual, for how quickly certain severities must be acknowledged or resolved. E.g., "Critical alerts acknowledged within 15 minutes, 24/7."</td></tr>
+          <tr><td class="tag">MTTA</td><td>Mean Time To Acknowledge</td><td>The average time between an alert firing and a human actually looking at it. Measures queue responsiveness.</td></tr>
+          <tr><td class="tag">MTTR</td><td>Mean Time To Respond / Resolve</td><td>The average time between an alert firing and the case being fully closed (contained, remediated, or dismissed with confidence). Measures end-to-end effectiveness.</td></tr>
+        </table>
+
+        <p>Why does a business obsess over these numbers? Because <strong>time is the one resource an attacker needs and a defender is trying to deny them.</strong> The concept of "dwell time", how long an attacker sits undetected in a network, is one of the most quoted statistics in the entire industry precisely because it's the clearest proxy for "how good is this SOC, really." Industry breach reports over the years (IBM's annual Cost of a Data Breach report is a commonly cited source) have repeatedly shown that breaches identified and contained faster cost organisations dramatically less, in direct financial terms, than ones that take months to detect.</p>
+
+        <div class="callout warning">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg> How these metrics get gamed, and why that's dangerous</div>
+          <p style="margin-bottom:0;">A team under pressure to hit an aggressive MTTA target can technically "acknowledge" every alert within seconds by clicking it open and immediately clicking it closed, the metric improves while the actual investigative work never happened. This is a real, documented failure mode in under-resourced or badly-incentivised SOCs. As an analyst, understand that these numbers exist to serve <em>good investigation</em>, not to be optimised directly at the expense of it. If you ever find yourself rushing a real judgement call purely to protect a personal MTTA statistic, that's a sign the incentive structure around you needs to be raised with your lead, not a sign you should cut the corner quietly.</p>
+        </div>
+      </section>
+
+      <!-- ================= HANDOVER ================= -->
+      <section id="handover">
+        <div class="section-tag">Core Concept 7</div>
+        <h2 class="section-title">Case ownership and handover</h2>
+        <p class="section-dek">Most SOCs run 24/7, which means no single analyst ever sees a case from start to finish. The quality of your handovers is, in a very real sense, the quality of your team's collective memory.</p>
+
+        <p>A case has a clear owner at every point in time, never "everyone," never "whoever picks it up next." When a shift ends with an open case, the outgoing analyst is responsible for making sure the incoming analyst can continue without a debrief call at 6 a.m. This is exactly the discipline your Week 3 case-management module will build on, and the discipline you'll practice again during the incident response and capstone weeks later in this programme, it starts as a habit here.</p>
+
+        <div class="callout story">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> A realistic scenario</div>
+          <p style="margin-bottom:0;">It's 23:50. Amara is closing out her shift and has one open, unresolved alert: a suspicious outbound connection from a finance server, moderate confidence, that she hasn't finished investigating. She could write "still checking this, seems weird" and hand off verbally to the night analyst who hasn't arrived yet. Instead, she writes a structured note: what she's checked, what she hasn't, her working hypothesis, and the exact next step she'd take if she had ten more minutes. At 00:15, Tunde starts his shift, reads the note, and picks up exactly where she left off, no phone call needed, no repeated work, no lost thirty minutes at the start of the night shift while a potentially live incident sits idle.</p>
+        </div>
+      </section>
+
+      <!-- ================= HANDS ON WALKTHROUGH ================= -->
+      <section id="walkthrough">
+        <div class="section-tag">Applied Practice</div>
+        <h2 class="section-title">Hands-on: a full triage walkthrough, worked start to finish</h2>
+        <p class="section-dek">No lab is needed this week, but seeing exactly how a seasoned analyst reasons through a real queue entry, end to end, is what turns the theory above into something you can actually do.</p>
+
+        <p>Below is a realistic mixed queue of five alerts, exactly the kind you'll receive as this week's deliverable exercise (with a different, unseen set). Watch how each one gets worked, not just what the final answer is.</p>
+
+        <h4>Alert Queue: Shift 09:00–17:00, 14 August 2026</h4>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="a1">#1 Brute force</button>
+            <button class="tab-btn" data-tab="a2">#2 New admin</button>
+            <button class="tab-btn" data-tab="a3">#3 DNS beacon</button>
+            <button class="tab-btn" data-tab="a4">#4 USB write</button>
+            <button class="tab-btn" data-tab="a5">#5 After-hours DB</button>
+          </div>
+
+          <div class="tab-panel active" id="a1">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">SOC-11201</span></div>
+              <div class="term-body">Rule: <span class="f1">Repeated Failed Logon Followed by Success</span>
+Account: SVC-BACKUP (service account)
+Failures: 47 over 6 minutes, then 1 success
+Source: 10.20.4.201 (internal, backup server subnet)
+Target: DC-02 (Domain Controller)</div>
+            </div>
+            <div class="callwidget" data-call="a1" data-correct-class="tp" data-correct-priority="critical">
+              <div class="callwidget-title">Make the call before you read on</div>
+              <div class="call-row"><span class="call-label">Classification</span>
+                <button class="call-pill" data-group="a1-class" data-val="tp">True Positive</button>
+                <button class="call-pill" data-group="a1-class" data-val="fp">False Positive</button>
+                <button class="call-pill" data-group="a1-class" data-val="btp">Benign True Positive</button>
+              </div>
+              <div class="call-row"><span class="call-label">Priority</span>
+                <button class="call-pill" data-group="a1-priority" data-val="critical">Critical</button>
+                <button class="call-pill" data-group="a1-priority" data-val="high">High</button>
+                <button class="call-pill" data-group="a1-priority" data-val="low">Low</button>
+              </div>
+              <button class="reveal-btn" onclick="revealCall('a1')">Reveal expert analysis</button>
+              <div class="expert-analysis" id="expert-a1">
+                <div class="match-banner" id="banner-a1"></div>
+                <p><strong>Reasoning:</strong> Service accounts should never show 47 failed logons. They don't "mistype" passwords like humans do. That pattern is far more consistent with an automated password-guessing attempt, or a misconfigured scheduled job retrying with a stale credential.</p>
+            <p><strong>Classification:</strong> <span class="badge b-true">Likely True Positive</span> (pending confirmation) &nbsp; <strong>Severity:</strong> <span class="badge b-high">HIGH</span> (domain controller, service account, successful logon after brute force) &nbsp; <strong>Confidence:</strong> <span class="badge b-med">MEDIUM</span> &nbsp; <strong>Priority:</strong> <span class="badge b-crit">CRITICAL: escalate now</span></p>
+                <p>Next step written in the note: check what the service account did immediately after the successful logon; check whether a scheduled backup job's stored credential was recently rotated (common cause of exactly this pattern) before assuming malicious intent, though escalate to Tier 2 immediately regardless, given the target is a domain controller.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="a2">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E3A63E"></span><span class="term-label">SOC-11202</span></div>
+              <div class="term-body">Rule: <span class="f1">New Member Added to Domain Admins Group</span>
+Actor: IT.ADMIN.BISI
+New member: J.NWACHUKWU
+Time: 11:14:02
+Change ticket referenced in event: CHG-2287</div>
+            </div>
+            <div class="callwidget" data-call="a2" data-correct-class="btp" data-correct-priority="low">
+              <div class="callwidget-title">Make the call before you read on</div>
+              <div class="call-row"><span class="call-label">Classification</span>
+                <button class="call-pill" data-group="a2-class" data-val="tp">True Positive</button>
+                <button class="call-pill" data-group="a2-class" data-val="fp">False Positive</button>
+                <button class="call-pill" data-group="a2-class" data-val="btp">Benign True Positive</button>
+              </div>
+              <div class="call-row"><span class="call-label">Priority</span>
+                <button class="call-pill" data-group="a2-priority" data-val="critical">Critical</button>
+                <button class="call-pill" data-group="a2-priority" data-val="high">High</button>
+                <button class="call-pill" data-group="a2-priority" data-val="low">Low</button>
+              </div>
+              <button class="reveal-btn" onclick="revealCall('a2')">Reveal expert analysis</button>
+              <div class="expert-analysis" id="expert-a2">
+                <div class="match-banner" id="banner-a2"></div>
+                <p><strong>Reasoning:</strong> Domain Admins membership changes are always high severity by nature of the privilege involved. This event carries a change ticket reference, which is exactly the kind of corroborating context that should be checked, not assumed.</p>
+            <p><strong>Classification (after checking CHG-2287 in the change management system and confirming it's an approved, scheduled promotion):</strong> <span class="badge b-info">Benign True Positive</span> &nbsp; <strong>Severity:</strong> <span class="badge b-high">HIGH</span> (by nature, Domain Admin is always high severity as a category) &nbsp; <strong>Confidence:</strong> <span class="badge b-true">HIGH</span> (confirmed against source-of-truth records) &nbsp; <strong>Priority:</strong> <span class="badge b-low">LOW: document and close</span></p>
+                <p>Note the discipline: severity stays HIGH even though this closes quickly, because the category of action is inherently high-impact if it were ever unauthorised. A future reviewer scanning only by severity should still be able to find this event if needed.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="a3">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E3A63E"></span><span class="term-label">SOC-11203</span></div>
+              <div class="term-body">Rule: <span class="f1">Periodic Beaconing Pattern: DNS</span>
+Host: MKT-WK-032
+Destination: analytics-cdn-edge7[.]net
+Interval: every 58–62 seconds, ±2s jitter
+Duration observed: 6 hours 40 minutes
+Volume: ~48 bytes per query (unusually small and consistent)</div>
+            </div>
+            <div class="callwidget" data-call="a3" data-correct-class="tp" data-correct-priority="high">
+              <div class="callwidget-title">Make the call before you read on</div>
+              <div class="call-row"><span class="call-label">Classification</span>
+                <button class="call-pill" data-group="a3-class" data-val="tp">True Positive</button>
+                <button class="call-pill" data-group="a3-class" data-val="fp">False Positive</button>
+                <button class="call-pill" data-group="a3-class" data-val="btp">Benign True Positive</button>
+              </div>
+              <div class="call-row"><span class="call-label">Priority</span>
+                <button class="call-pill" data-group="a3-priority" data-val="critical">Critical</button>
+                <button class="call-pill" data-group="a3-priority" data-val="high">High</button>
+                <button class="call-pill" data-group="a3-priority" data-val="low">Low</button>
+              </div>
+              <button class="reveal-btn" onclick="revealCall('a3')">Reveal expert analysis</button>
+              <div class="expert-analysis" id="expert-a3">
+                <div class="match-banner" id="banner-a3"></div>
+                <p><strong>Reasoning:</strong> Regular, tightly-timed beaconing with jittered intervals and small, consistent payload sizes is a classic command-and-control communication pattern. This is one of the signatures you'll learn to hunt for explicitly in Week 10 and Week 9 (Zeek/Suricata). The domain name is designed to look like a legitimate analytics/CDN service, which is itself a red flag: attackers deliberately choose plausible-sounding domains.</p>
+                <p><strong>Classification:</strong> <span class="badge b-true">Suspected True Positive</span> &nbsp; <strong>Severity:</strong> <span class="badge b-high">HIGH</span> &nbsp; <strong>Confidence:</strong> <span class="badge b-med">MEDIUM</span> (pattern is highly suggestive but domain hasn't yet been confirmed malicious against threat intel) &nbsp; <strong>Priority:</strong> <span class="badge b-crit">HIGH: escalate for hunting/enrichment</span></p>
+                <p>Correctly, this analyst does not wait for a threat intelligence lookup before escalating. The behavioural pattern alone is strong enough evidence to act on now, with enrichment (Week 13 onward) running in parallel, not as a gate before action.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="a4">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#3FC1B0"></span><span class="term-label">SOC-11204</span></div>
+              <div class="term-body">Rule: <span class="f1">Large File Write to Removable Media</span>
+Host: DESIGN-WK-011
+User: T.BALOGUN (Graphic Designer)
+Volume: 2.3 GB written to USB device "SanDisk Ultra"
+Files: *.psd, *.ai, *.png (design assets)
+Time: 15:42 (within normal working hours)</div>
+            </div>
+            <div class="callwidget" data-call="a4" data-correct-class="btp" data-correct-priority="low">
+              <div class="callwidget-title">Make the call before you read on</div>
+              <div class="call-row"><span class="call-label">Classification</span>
+                <button class="call-pill" data-group="a4-class" data-val="tp">True Positive</button>
+                <button class="call-pill" data-group="a4-class" data-val="fp">False Positive</button>
+                <button class="call-pill" data-group="a4-class" data-val="btp">Benign True Positive</button>
+              </div>
+              <div class="call-row"><span class="call-label">Priority</span>
+                <button class="call-pill" data-group="a4-priority" data-val="critical">Critical</button>
+                <button class="call-pill" data-group="a4-priority" data-val="high">High</button>
+                <button class="call-pill" data-group="a4-priority" data-val="low">Low</button>
+              </div>
+              <button class="reveal-btn" onclick="revealCall('a4')">Reveal expert analysis</button>
+              <div class="expert-analysis" id="expert-a4">
+                <div class="match-banner" id="banner-a4"></div>
+                <p><strong>Reasoning:</strong> This user's role plausibly explains large design file transfers to removable media. Designers routinely move large asset files to USB drives for client delivery or print vendors. Context (role, file types, time of day) all align with expected behaviour.</p>
+                <p><strong>Classification:</strong> <span class="badge b-info">Benign True Positive</span> &nbsp; <strong>Severity:</strong> <span class="badge b-med">MEDIUM</span> (data exfiltration category is never "low" by default; it is contextually downgraded here, not dismissed by category) &nbsp; <strong>Confidence:</strong> <span class="badge b-true">HIGH</span> &nbsp; <strong>Priority:</strong> <span class="badge b-low">LOW: document and close</span></p>
+                <p>A junior mistake here would be to close this as "false positive." The rule fired correctly and the described activity genuinely happened. It's benign, not false. Data-loss-prevention policy questions (should designers be allowed unencrypted USB transfer at all?) get raised separately with the policy team. That's not this analyst's call to make unilaterally, but it is worth noting in the ticket as an observation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="a5">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">SOC-11205</span></div>
+              <div class="term-body">Rule: <span class="f1">Database Admin Console Access Outside Business Hours</span>
+Account: DBA_KEMI
+Time: 02:14 WAT
+Action: Full export of CUSTOMERS table (412,000 rows)
+Source: Kemi's usual workstation, VPN not used, on-site badge log shows NO entry that night</div>
+            </div>
+            <div class="callwidget" data-call="a5" data-correct-class="tp" data-correct-priority="critical">
+              <div class="callwidget-title">Make the call before you read on</div>
+              <div class="call-row"><span class="call-label">Classification</span>
+                <button class="call-pill" data-group="a5-class" data-val="tp">True Positive</button>
+                <button class="call-pill" data-group="a5-class" data-val="fp">False Positive</button>
+                <button class="call-pill" data-group="a5-class" data-val="btp">Benign True Positive</button>
+              </div>
+              <div class="call-row"><span class="call-label">Priority</span>
+                <button class="call-pill" data-group="a5-priority" data-val="critical">Critical</button>
+                <button class="call-pill" data-group="a5-priority" data-val="high">High</button>
+                <button class="call-pill" data-group="a5-priority" data-val="low">Low</button>
+              </div>
+              <button class="reveal-btn" onclick="revealCall('a5')">Reveal expert analysis</button>
+              <div class="expert-analysis" id="expert-a5">
+                <div class="match-banner" id="banner-a5"></div>
+                <p><strong>Reasoning:</strong> This is the alert designed to test whether you actually read every field, not just the headline rule name. The badge log discrepancy (no physical entry recorded, yet activity from her usual workstation) is the single most important detail in the whole alert, and it directly contradicts the simplest explanation ("she came in early to work").</p>
+                <p><strong>Classification:</strong> <span class="badge b-true">True Positive (likely compromised credentials or workstation)</span> &nbsp; <strong>Severity:</strong> <span class="badge b-crit">CRITICAL</span> (412,000 customer records, a textbook data breach if confirmed) &nbsp; <strong>Confidence:</strong> <span class="badge b-med">MEDIUM-HIGH</span> &nbsp; <strong>Priority:</strong> <span class="badge b-crit">CRITICAL: immediate escalation, do not wait for shift handover</span></p>
+                <p>This is the alert every analyst must get right. It's also a realistic illustration of why "context" (Core Concept 4, step 2) is not optional. The badge log is a data source most junior analysts wouldn't think to check on a database alert at all.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> What this walkthrough was really testing</div>
+          <p style="margin-bottom:0;">Notice that severity of the underlying <em>category</em> (Domain Admin changes, data exfiltration, database exports) stayed consistently high across alerts #2, #4 and #5, even though two of them closed as benign. Only confidence and priority moved based on context. If you found yourself wanting to mark #2 and #4 as "low severity" just because they turned out fine, go back and re-read Core Concept 3. That's the single most common reasoning error this week is designed to correct.</p>
+        </div>
+      </section>
+
+      <!-- ================= DELIVERABLE ================= -->
+      <section id="deliverable">
+        <div class="deliverable-box">
+          <div class="section-tag">This Week's Deliverable</div>
+          <h3 style="margin-top:0;">Professional alert-triage sheet</h3>
+          <p>You will receive a mixed queue of benign, suspicious, and malicious alerts, without being told in advance which is which, deliberately mirroring the walkthrough above but with a fresh set of scenarios. For every alert in the queue, your triage sheet must contain:</p>
+          <ul>
+            <li>Your classification: <strong>True Positive</strong>, <strong>False Positive</strong>, or <strong>Benign True Positive</strong>, with reasoning, not just the label.</li>
+            <li><strong>Severity, Priority, and Confidence</strong>, assigned independently, each with a one-line justification.</li>
+            <li><strong>Evidence referenced</strong>, what specifically in the alert (or context you'd check) supports your conclusion.</li>
+            <li>Your <strong>disposition</strong>: close, monitor, or escalate, and if escalating, to whom and with what specific next step.</li>
+            <li>An <strong>analyst note</strong> for at least two of the alerts, written to the "stranger" standard from Core Concept 5.</li>
+          </ul>
+          <p style="margin-bottom:0;">This sheet is graded on the quality and defensibility of your reasoning, not on whether you happened to land on the label an instructor had in mind. Two analysts can reasonably disagree on a borderline classification and both score well, provided their reasoning is sound and evidence-based.</p>
+        </div>
+      </section>
+
+      <!-- ================= CHECKPOINT ================= -->
+      <section id="checkpoint">
+        <div class="checkpoint-box">
+          <div class="section-tag">Competency Checkpoint</div>
+          <h3 style="margin-top:0;">What "passing" Week 1 actually looks like</h3>
+          <p style="margin-bottom:0;">You can make defensible first-line decisions on an unfamiliar alert <strong>without an instructor labelling it for you first.</strong> That means: given a genuinely new scenario you've never seen, you correctly identify what category of question you're answering (is it real? how bad? how sure? how urgent?), you know which evidence would change your answer, and you can write your reasoning down clearly enough that another analyst, or an auditor six months later, can follow exactly how you got there. Speed comes later. Correctness of reasoning is what Week 1 is building.</p>
+        </div>
+      </section>
+
+      <!-- ================= GLOSSARY ================= -->
+      <section id="glossary">
+        <div class="section-tag">Reference</div>
+        <h2 class="section-title">Glossary</h2>
+        <div class="accordion">
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Alert fatigue</span><span class="chev">▾</span></div><div class="accordion-body"><p>The degraded judgement that sets in when an analyst is exposed to a high volume of low-value alerts over time, leading to faster but less careful triage, and a higher risk of missing genuinely important alerts buried in the noise.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Dwell time</span><span class="chev">▾</span></div><div class="accordion-body"><p>The length of time an attacker remains present and undetected inside a compromised environment, from initial access to detection. One of the most closely watched industry metrics for SOC effectiveness.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Escalation</span><span class="chev">▾</span></div><div class="accordion-body"><p>The act of formally handing an alert or case to a more senior analyst, a different team, or management, because it exceeds the current handler's authority, expertise, or the situation's urgency.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Detection rule / correlation rule</span><span class="chev">▾</span></div><div class="accordion-body"><p>Logic, written by a human, that examines incoming events (or patterns across multiple events) and decides whether to generate an alert. You'll write these yourself starting Week 5.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Tier 1 / Tier 2 / Tier 3</span><span class="chev">▾</span></div><div class="accordion-body"><p>A common (though not universal) SOC staffing structure. Tier 1 performs initial triage; Tier 2 conducts deeper investigation; Tier 3 handles the most complex cases, threat hunting, and detection engineering. Many smaller SOCs blend these tiers, this programme trains you across all of them.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Disposition</span><span class="chev">▾</span></div><div class="accordion-body"><p>The final decision recorded against an alert or case: typically closed (with a reason), monitored, or escalated.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ================= FURTHER READING ================= -->
+      <section id="further">
+        <div class="section-tag">Go Deeper</div>
+        <h2 class="section-title">Further reading &amp; real-world grounding</h2>
+        <ul>
+          <li><strong>IBM's annual "Cost of a Data Breach" report</strong>, look at how detection/containment speed correlates with financial impact; a genuinely eye-opening read for understanding why MTTA/MTTR matter to a business, not just a SOC.</li>
+          <li><strong>The Target Corporation 2013 breach retrospective</strong>, widely written about; a sobering, concrete case study in what happens when correct alerts don't translate into correct action.</li>
+          <li><strong>MITRE ATT&CK framework (attack.mitre.org)</strong>, you don't need to study it in depth yet (Week 5 covers it formally), but browsing it now will make the vocabulary in later weeks feel familiar rather than new.</li>
+          <li>Ask a working SOC analyst (if you know one) to describe their worst "we should have caught that sooner" story. Real anecdotes stick far better than any textbook example, including the ones in this document.</li>
+        </ul>
+      </section>
+
+      <div class="weeknav">
+        <a href="#" style="opacity:0.4; pointer-events:none;">← Programme start</a>
+        <a href="#toc">↑ Back to top</a>
+        <a href="#" style="opacity:0.4; pointer-events:none;">Week 2: Enterprise Telemetry →</a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tabs').forEach(tabGroup => {
+    const buttons = tabGroup.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        tabGroup.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        tabGroup.querySelector('#' + target).classList.add('active');
+      });
+    });
+  });
+
+  // Accordion
+  document.querySelectorAll('.accordion-item').forEach(item => {
+    item.querySelector('.accordion-head').addEventListener('click', () => {
+      item.classList.toggle('open');
+    });
+  });
+
+  // ---------- Quick self-test quiz ----------
+  document.querySelectorAll('.quiz-item').forEach(item => {
+    const correct = item.getAttribute('data-answer');
+    item.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (item.classList.contains('answered')) return;
+        item.classList.add('answered');
+        const choice = btn.getAttribute('data-choice');
+        if (choice === correct) {
+          btn.classList.add('chosen-correct');
+        } else {
+          btn.classList.add('chosen-wrong');
+          item.querySelector('.quiz-opt[data-choice="' + correct + '"]').classList.add('reveal-correct');
+        }
+      });
+    });
+  });
+
+  // ---------- Drag and drop matching exercise ----------
+  const matchGame = document.getElementById('matchGame');
+  if (matchGame) {
+    const chips = matchGame.querySelectorAll('.drag-chip');
+    const zones = matchGame.querySelectorAll('.drop-zone');
+    let placedCount = 0;
+
+    chips.forEach(chip => {
+      chip.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', chip.getAttribute('data-term'));
+        setTimeout(() => chip.style.opacity = '0.4', 0);
+      });
+      chip.addEventListener('dragend', () => { chip.style.opacity = '1'; });
+      // Touch/click fallback: click a chip, then click a zone
+      chip.addEventListener('click', () => {
+        if (chip.classList.contains('placed')) return;
+        matchGame.querySelectorAll('.drag-chip').forEach(c => c.style.outline = '');
+        chip.style.outline = '2px solid #E3A63E';
+        matchGame._selectedChip = chip;
+      });
+    });
+
+    zones.forEach(zone => {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        const term = e.dataTransfer.getData('text/plain');
+        placeChip(zone, term);
+      });
+      zone.addEventListener('click', () => {
+        if (matchGame._selectedChip && !zone.classList.contains('filled')) {
+          placeChip(zone, matchGame._selectedChip.getAttribute('data-term'));
+          matchGame._selectedChip.style.outline = '';
+          matchGame._selectedChip = null;
+        }
+      });
+    });
+
+    function placeChip(zone, term) {
+      if (zone.classList.contains('filled')) return;
+      const chip = matchGame.querySelector('.drag-chip[data-term="' + term + '"]');
+      if (!chip || chip.classList.contains('placed')) return;
+      const isCorrect = zone.getAttribute('data-correct') === term;
+      zone.classList.add('filled');
+      if (!isCorrect) zone.classList.add('wrong');
+      zone.querySelector('.dz-label').textContent = chip.textContent + (isCorrect ? ' correct' : ' incorrect');
+      chip.classList.add('placed');
+      chip.setAttribute('draggable', 'false');
+      placedCount++;
+      const status = document.getElementById('matchStatus');
+      if (placedCount === chips.length) {
+        const wrongCount = matchGame.querySelectorAll('.drop-zone.wrong').length;
+        status.textContent = wrongCount === 0
+          ? 'All three matched correctly. That is the whole concept in one exercise.'
+          : (chips.length - wrongCount) + ' of ' + chips.length + ' correct. Reset and try again, or re-read the paragraph above the diagram.';
+      } else {
+        status.textContent = placedCount + ' of ' + chips.length + ' placed.';
+      }
+    }
+  }
+
+  function resetMatch() {
+    const matchGame = document.getElementById('matchGame');
+    matchGame.querySelectorAll('.drag-chip').forEach(c => {
+      c.classList.remove('placed');
+      c.setAttribute('draggable', 'true');
+      c.style.outline = '';
+    });
+    matchGame.querySelectorAll('.drop-zone').forEach(z => {
+      z.classList.remove('filled', 'wrong');
+      z.querySelector('.dz-label').textContent = 'Drop here';
+    });
+    document.getElementById('matchStatus').textContent = 'Drag all three cards to see your score.';
+  }
+
+  // ---------- "Make the call" widgets ----------
+  document.querySelectorAll('.call-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const group = pill.getAttribute('data-group');
+      document.querySelectorAll('.call-pill[data-group="' + group + '"]').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+    });
+  });
+
+  function revealCall(id) {
+    const widget = document.querySelector('.callwidget[data-call="' + id + '"]');
+    const expert = document.getElementById('expert-' + id);
+    const banner = document.getElementById('banner-' + id);
+    const correctClass = widget.getAttribute('data-correct-class');
+    const correctPriority = widget.getAttribute('data-correct-priority');
+    const chosenClass = widget.querySelector('.call-pill[data-group="' + id + '-class"].selected');
+    const chosenPriority = widget.querySelector('.call-pill[data-group="' + id + '-priority"].selected');
+
+    let matches = 0, total = 0;
+    if (chosenClass) { total++; if (chosenClass.getAttribute('data-val') === correctClass) matches++; }
+    if (chosenPriority) { total++; if (chosenPriority.getAttribute('data-val') === correctPriority) matches++; }
+
+    banner.classList.add('shown');
+    if (total === 0) {
+      banner.textContent = "You didn't select an answer, but here's the expert breakdown anyway.";
+      banner.classList.add('partial-match');
+    } else if (matches === total) {
+      banner.textContent = 'Your call matched the expert analysis on ' + matches + ' of ' + total + ' points. Nice work.';
+      banner.classList.add('full-match');
+    } else {
+      banner.textContent = 'Your call matched on ' + matches + ' of ' + total + ' points. Read the reasoning below to see where your thinking diverged.';
+      banner.classList.add('partial-match');
+    }
+    expert.classList.add('shown');
+    widget.querySelector('.reveal-btn').disabled = true;
+    widget.querySelector('.reveal-btn').textContent = 'Analysis revealed below';
+  }
+
+  // Scrollspy for TOC
+  const sections = document.querySelectorAll('main section[id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.getAttribute('id');
+      const link = document.querySelector('.toc-list a[href="#' + id + '"]');
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
